@@ -5,6 +5,7 @@ import GlobalStyle from './global/styles/index';
 
 import NavBar from './global/components/NavBar';
 import Home from './modules/Home';
+import ConvexHull from './modules/ConvexHull';
 
 const Container = styled.div`
   margin: 0 auto;
@@ -20,7 +21,7 @@ function App(): JSX.Element {
         <NavBar />
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/convex-hull' element={<Home />} />
+          <Route path='/convex-hull' element={<ConvexHull />} />
           <Route path='/line-segment-intersection' element={<Home />} />
           <Route path='/polygon-triangulation' element={<Home />} />
         </Routes>

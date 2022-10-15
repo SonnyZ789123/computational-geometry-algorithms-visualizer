@@ -9,8 +9,10 @@ import { ReactComponent as SkipForwardIcon } from '../../assets/icons/skip-forwa
 import { Button } from '../../global/components/Buttons';
 
 const Container = styled.div`
+  grid-column: 10 / end;
   display: flex;
   flex-flow: column nowrap;
+  gap: 1rem;
 `;
 
 const PlayContainer = styled.div`

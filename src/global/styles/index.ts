@@ -2,6 +2,10 @@ import { createGlobalStyle } from 'styled-components';
 import colors from './colors';
 
 export default createGlobalStyle`
+  * {
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
     background-color: ${colors.dark};

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import colors from '../../global/styles/colors';
 
 const CanvasWrapper = styled.div`
+  grid-column: 1 / 9;
   border: 5px solid ${colors.primary};
   border-radius: 20px;
 `;
