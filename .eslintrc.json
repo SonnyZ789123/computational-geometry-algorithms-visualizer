@@ -16,6 +16,7 @@
     "no-console": "warn",
     "no-trailing-spaces": "error",
     "react/require-default-props": "off",
+    "no-continue": "off",
     "prettier/prettier": [
       "error",
       {
