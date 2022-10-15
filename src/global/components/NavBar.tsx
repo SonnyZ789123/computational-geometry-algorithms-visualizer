@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import colors from '../styles/colors';
 
 const Nav = styled.nav`
@@ -10,7 +11,7 @@ const Nav = styled.nav`
   gap: 2rem;
 `;
 
-const Link = styled.a`
+const StyledLink = styled(Link)`
   &:hover {
     color: ${colors.secondary};
   }
@@ -19,9 +20,11 @@ const Link = styled.a`
 function NavBar(): JSX.Element {
   return (
     <Nav>
-      <Link href='/convex-hulls'>Convex Hulls</Link>
-      <Link href='/line-segment-intersection'>Line Segment Intersection</Link>
-      <Link href='/polygon-triangulation'>Polygon Triangulation</Link>
+      <StyledLink to='/convex-hulls'>Convex Hulls</StyledLink>
+      <StyledLink to='/line-segment-intersection'>
+        Line Segment Intersection
+      </StyledLink>
+      <StyledLink to='/polygon-triangulation'>Polygon Triangulation</StyledLink>
     </Nav>
   );
 }
