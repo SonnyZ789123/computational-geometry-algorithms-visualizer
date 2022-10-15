@@ -20,7 +20,7 @@ function App(): JSX.Element {
         <NavBar />
         <Routes>
           <Route path='/' element={<Home />} />
-          <Route path='/convex-hulls' element={<Home />} />
+          <Route path='/convex-hull' element={<Home />} />
           <Route path='/line-segment-intersection' element={<Home />} />
           <Route path='/polygon-triangulation' element={<Home />} />
         </Routes>

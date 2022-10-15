@@ -20,7 +20,7 @@ const StyledLink = styled(Link)`
 function NavBar(): JSX.Element {
   return (
     <Nav>
-      <StyledLink to='/convex-hulls'>Convex Hulls</StyledLink>
+      <StyledLink to='/convex-hull'>Convex Hulls</StyledLink>
       <StyledLink to='/line-segment-intersection'>
         Line Segment Intersection
       </StyledLink>
