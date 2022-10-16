@@ -3,7 +3,7 @@ import {
   intersectLines,
   relativeOrientation,
   turnOrientation,
-} from '../lib/helpers';
+} from '../lib/algorithms/helpers';
 
 describe('Algorithms helpers tests', () => {
   const v0 = {

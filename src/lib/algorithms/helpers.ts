@@ -1,4 +1,4 @@
-import { DirectedLine, Line, Vertex } from '../types';
+import { DirectedLine, Line, Vertex } from '../../types';
 
 /**
  * Calculates the cross product.
