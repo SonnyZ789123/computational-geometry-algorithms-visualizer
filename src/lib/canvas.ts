@@ -7,8 +7,10 @@ import { Vertex } from '../types';
 export const DOT_SIZE = 3;
 export const LINE_WIDTH = 1;
 export const GRID_SIZE = 10;
+export const MIN_DELTA = 1; // Min space between 2 points
 export const CANVAS_WIDTH = 500;
 export const CANVAS_HEIGHT = 500;
+export const TOTAL_POINTS = (CANVAS_WIDTH * CANVAS_HEIGHT) / MIN_DELTA ** 2;
 export const X_MAX = Math.floor(CANVAS_WIDTH / GRID_SIZE);
 export const Y_MAX = Math.floor(CANVAS_HEIGHT / GRID_SIZE);
 
@@ -49,6 +51,21 @@ export function clearCanvas(ctx: CanvasRenderingContext2D) {
   drawGrid(ctx);
 }
 
+export function readyCanvas(
+  canvasRef: React.RefObject<HTMLCanvasElement>
+): CanvasRenderingContext2D | undefined {
+  if (!canvasRef.current) {
+    return;
+  }
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return;
+  }
+
+  return ctx;
+}
+
 /// /////////
 // Drawing
 /// /////////
@@ -68,4 +85,26 @@ export function drawEdge(
   ctx.moveTo(v1.x, v1.y);
   ctx.lineTo(v2.x, v2.y);
   ctx.stroke();
+}
+
+/// /////////
+// Generators
+/// /////////
+export function generateRandomVertices(amount: number) {
+  const vertices: Vertex[] = [];
+
+  for (let i = 0; i < amount; i += 1) {
+    const x =
+      Math.floor(Math.random() * (CANVAS_WIDTH / MIN_DELTA)) * MIN_DELTA; // First scale to integers, pick a rondom number between all possible x-coo, then scale back to right size
+    const y =
+      Math.floor(Math.random() * (CANVAS_HEIGHT / MIN_DELTA)) * MIN_DELTA;
+
+    if (!vertices.find((v) => v.x === x && v.y === y)) {
+      vertices.push({ x, y });
+    } else {
+      i -= 1;
+    }
+  }
+
+  return vertices;
 }

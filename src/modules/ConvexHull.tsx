@@ -1,29 +1,55 @@
-import React, { useRef, useEffect } from 'react';
-import { drawDot, drawEdge, clearCanvas } from '../lib/canvas';
+import React, { useRef, useEffect, useState } from 'react';
+import {
+  clearCanvas,
+  drawDot,
+  generateRandomVertices,
+  readyCanvas,
+} from '../lib/canvas';
 
 import PageWrapper from './_common/PageWrapper';
 import Canvas from './_common/Canvas';
 import Controls from './_common/Controls';
+import { Vertex } from '../types';
 
 function ConvexHull(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const [speed, setSpeed] = useState(1);
+  const [amount, setAmount] = useState(10);
+
+  const [vertices, setVertices] = useState<Vertex[]>([]);
+
+  const randomize = () => {
+    const ctx = readyCanvas(canvasRef);
+    if (ctx) {
+      clearCanvas(ctx);
+      setVertices(generateRandomVertices(amount));
+      vertices.forEach((v) => {
+        drawDot(ctx, v);
+      });
+    }
+  };
+
   useEffect(() => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        drawDot(ctx, { x: 250, y: 250 });
-        drawEdge(ctx, { x: 250, y: 250 }, { x: 300, y: 300 });
-        clearCanvas(ctx);
-      }
+    const ctx = readyCanvas(canvasRef);
+    if (ctx) {
+      setVertices(generateRandomVertices(amount));
+      vertices.forEach((v) => {
+        drawDot(ctx, v);
+      });
     }
   }, []);
 
   return (
     <PageWrapper>
       <Canvas canvasRef={canvasRef} />
-      <Controls />
+      <Controls
+        speed={speed}
+        setSpeed={setSpeed}
+        amount={amount}
+        setAmount={setAmount}
+        randomize={randomize}
+      />
     </PageWrapper>
   );
 }
