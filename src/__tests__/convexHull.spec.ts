@@ -17,6 +17,7 @@ describe('Convex Hull tests', () => {
 
   const CH: Vertex[] = [
     { x: 3, y: 3 },
+    { x: 4, y: 8 },
     { x: 5, y: 12 },
     { x: 12, y: 12 },
     { x: 13, y: 5 },
@@ -24,8 +25,9 @@ describe('Convex Hull tests', () => {
 
   describe('Brute Force', () => {
     const convexHull = bruteForceConvexHull(V);
+
     it('contains 4 verices', () => {
-      expect(convexHull).toHaveLength(4);
+      expect(convexHull).toHaveLength(CH.length);
     });
 
     it('contains the vertices of the convex hull in clockwise order', () => {
