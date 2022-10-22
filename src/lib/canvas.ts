@@ -1,5 +1,5 @@
 import colors from '../global/styles/colors';
-import { Vertex, Edge, DirectedEdge } from '../types';
+import { Vertex, Edge, DirectedEdge, DrawBuffer } from '../types';
 
 /// /////////
 // Config
@@ -113,6 +113,34 @@ export function drawDirectedEdge(
     to.y - ARROW_LEN * Math.sin(angle + Math.PI / 6)
   );
   ctx.stroke();
+}
+
+export function redrawBuffer(
+  ctx: CanvasRenderingContext2D,
+  drawBuffer: DrawBuffer
+) {
+  // use for-loop for better performance
+  for (let i = 0; i < drawBuffer.vertices.length; i += 1) {
+    drawDot(ctx, drawBuffer.vertices[i].value, drawBuffer.vertices[i].color);
+  }
+  for (let i = 0; i < drawBuffer.edges.length; i += 1) {
+    drawEdge(ctx, drawBuffer.edges[i].value, drawBuffer.edges[i].color);
+  }
+  for (let i = 0; i < drawBuffer.directedEdges.length; i += 1) {
+    drawDirectedEdge(
+      ctx,
+      drawBuffer.directedEdges[i].value,
+      drawBuffer.directedEdges[i].color
+    );
+  }
+}
+
+export function clearAndRedrawBuffer(
+  ctx: CanvasRenderingContext2D,
+  drawBuffer: DrawBuffer
+) {
+  clearCanvas(ctx);
+  redrawBuffer(ctx, drawBuffer);
 }
 
 /// /////////

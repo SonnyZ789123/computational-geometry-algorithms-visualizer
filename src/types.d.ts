@@ -18,11 +18,9 @@ export type DirectedLine = {
   to: Vertex;
 };
 
-// export type LineSegment = Set<Vertex>;
-
-// export type DirectedLineSegment = {
-//   from: Vertex;
-//   to: Vertex;
-// };
-
-// Convex Hull
+// DrawBuffer
+export type DrawBuffer = {
+  vertices: { value: Vertex; color: string }[];
+  edges: { value: Edge; color: string }[];
+  directedEdges: { value: Directed; color: string }[];
+};
