@@ -1,5 +1,5 @@
 import colors from '../global/styles/colors';
-import { Vertex } from '../types';
+import { Vertex, Edge, DirectedEdge } from '../types';
 
 /// /////////
 // Config
@@ -13,6 +13,7 @@ export const CANVAS_HEIGHT = 500;
 export const TOTAL_POINTS = (CANVAS_WIDTH * CANVAS_HEIGHT) / MIN_DELTA ** 2;
 export const X_MAX = Math.floor(CANVAS_WIDTH / GRID_SIZE);
 export const Y_MAX = Math.floor(CANVAS_HEIGHT / GRID_SIZE);
+const ARROW_LEN = MIN_DELTA * 7;
 
 /// /////////
 // Init and clear
@@ -69,21 +70,48 @@ export function readyCanvas(
 /// /////////
 // Drawing
 /// /////////
-export function drawDot(ctx: CanvasRenderingContext2D, v: Vertex) {
-  ctx.fillStyle = colors.secondary;
+export function drawDot(
+  ctx: CanvasRenderingContext2D,
+  v: Vertex,
+  color: string
+) {
+  ctx.fillStyle = color;
   ctx.fillRect(v.x - DOT_SIZE / 2, v.y - DOT_SIZE / 2, DOT_SIZE, DOT_SIZE); // Center it
 }
 
 export function drawEdge(
   ctx: CanvasRenderingContext2D,
-  v1: Vertex,
-  v2: Vertex
+  [v1, v2]: Edge,
+  color: string
 ) {
-  ctx.strokeStyle = colors.white;
+  ctx.strokeStyle = color;
   ctx.lineWidth = LINE_WIDTH;
   ctx.beginPath();
   ctx.moveTo(v1.x, v1.y);
   ctx.lineTo(v2.x, v2.y);
+  ctx.stroke();
+}
+
+export function drawDirectedEdge(
+  ctx: CanvasRenderingContext2D,
+  { from, to }: DirectedEdge,
+  color: string
+) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = LINE_WIDTH;
+  const angle = Math.atan2(to.y - from.y, to.x - from.x);
+  ctx.beginPath();
+  ctx.moveTo(from.x, from.y);
+  ctx.lineTo(to.x, to.y);
+  ctx.lineTo(
+    to.x - ARROW_LEN * Math.cos(angle - Math.PI / 6),
+    to.y - ARROW_LEN * Math.sin(angle - Math.PI / 6)
+  );
+  ctx.moveTo(to.x, to.y);
+  ctx.lineTo(
+    to.x - ARROW_LEN * Math.cos(angle + Math.PI / 6),
+    to.y - ARROW_LEN * Math.sin(angle + Math.PI / 6)
+  );
   ctx.stroke();
 }
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { Edge, Vertex } from '../../types';
 import { relativeOrientation } from './helpers';
 
