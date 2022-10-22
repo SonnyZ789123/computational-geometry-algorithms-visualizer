@@ -15,12 +15,12 @@
   "rules": {
     "no-console": "warn",
     "no-trailing-spaces": "error",
-    "react/require-default-props": "off",
+    "react/require-default-props": "off", // Don't need that
     "no-continue": "off",
-    "consistent-return": "off",
-    "no-restricted-syntax": "off",
+    "consistent-return": "off", // Want some flexibility with multiple possible return types
     "no-loop-func": "off",
     "import/prefer-default-export": "off",
+    "no-await-in-loop": "off", // the delay function needs to await
     "prettier/prettier": [
       "error",
       {

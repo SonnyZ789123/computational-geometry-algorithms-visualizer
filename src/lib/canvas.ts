@@ -47,6 +47,11 @@ export function drawGrid(ctx: CanvasRenderingContext2D) {
   }
 }
 
+/**
+ * Clears the canvas and draws the grid.
+ *
+ * @param {CanvasRenderingContext2D} ctx - The 2D context of a canvas
+ */
 export function clearCanvas(ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   drawGrid(ctx);

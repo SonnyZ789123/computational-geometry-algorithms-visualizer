@@ -21,6 +21,10 @@ const PlayContainer = styled.div`
   justify-content: space-between;
 `;
 
+const Icon = styled.div`
+  cursor: pointer;
+`;
+
 const ControlContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -38,22 +42,24 @@ const Input = styled.input`
 `;
 
 type ControlsProps = {
-  speed: number;
-  setSpeed: React.Dispatch<React.SetStateAction<number>>;
+  delay: number;
+  setDelay: React.Dispatch<React.SetStateAction<number>>;
   amount: number;
   setAmount: React.Dispatch<React.SetStateAction<number>>;
   randomize: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  start: () => void;
 };
 
 function Controls({
-  speed,
-  setSpeed,
+  delay,
+  setDelay,
   amount,
   setAmount,
   randomize,
+  start,
 }: ControlsProps): JSX.Element {
-  const handleSpeedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSpeed(Number(e.target.value));
+  const handleDelayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDelay(Number(e.target.value) * 1000);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,17 +69,23 @@ function Controls({
   return (
     <Container>
       <PlayContainer>
-        <SkipBackIcon />
-        <PlayIcon />
-        <SkipForwardIcon />
+        <Icon>
+          <SkipBackIcon />
+        </Icon>
+        <Icon>
+          <PlayIcon onClick={start} />
+        </Icon>
+        <Icon>
+          <SkipForwardIcon />
+        </Icon>
       </PlayContainer>
       <ControlContainer>
-        <Description htmlFor='speed'>Speed:</Description>
+        <Description htmlFor='delay'>Delay:</Description>
         <Input
-          id='speed'
-          name='speed'
-          value={`${speed}`}
-          onChange={handleSpeedChange}
+          id='delay'
+          name='delay'
+          value={`${delay / 1000}`}
+          onChange={handleDelayChange}
           type='number'
           min={0.1}
           step={0.1}

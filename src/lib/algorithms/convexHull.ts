@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { Edge, Vertex } from '../../types';
 import { relativeOrientation } from './helpers';
 
@@ -7,7 +8,6 @@ import { relativeOrientation } from './helpers';
  *
  * @returns {Vertex[]} A list containing the vertices of the convex hull in clockwise order
  */
-// eslint-disable-next-line import/prefer-default-export
 export function bruteForceConvexHull(vertices: Set<Vertex>): Vertex[] {
   const convexHullSet = new Set<Edge>();
 
