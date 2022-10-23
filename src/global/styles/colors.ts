@@ -6,6 +6,10 @@ export default {
   red: '#6F1B19',
   yellow: '#F9F871',
   orange: '#FFBA5A',
+  lightBlue: '#DCF5FA',
+  darkBlue: '#2690A0',
+  lightGreen: '#48EDCB',
+  darkGreen: '#007E62',
   // greys
   white: '#FFFFFF',
   black: '#000000',

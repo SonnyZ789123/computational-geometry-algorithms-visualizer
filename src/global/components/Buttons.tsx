@@ -8,7 +8,7 @@ const StyledButton = styled.button<Pick<ButtonProps, 'color'>>`
   color: ${colors.white};
   border-radius: 15px;
   background-color: ${({ color }) => colors[color]};
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   padding: 10px 25px;
 
   &:hover {

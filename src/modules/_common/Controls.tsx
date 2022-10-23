@@ -15,7 +15,7 @@ const Container = styled.div`
   grid-column: 10 / end;
   display: flex;
   flex-flow: column nowrap;
-  gap: 1rem;
+  gap: 1.5rem;
 `;
 
 const PlayContainer = styled.div`
@@ -23,8 +23,14 @@ const PlayContainer = styled.div`
   justify-content: space-between;
 `;
 
-const Icon = styled.div`
-  cursor: pointer;
+const Icon = styled.button<{ disabled?: boolean }>`
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
+  background: none;
+  border: none;
+  stroke: ${({ disabled }) => (disabled ? colors.darkGreen : colors.secondary)};
 `;
 
 const ControlContainer = styled.div`
@@ -33,12 +39,12 @@ const ControlContainer = styled.div`
 `;
 
 const Description = styled.label`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: ${colors.white};
 `;
 
 const Input = styled.input`
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: ${colors.secondary};
   width: 30%;
 `;
@@ -131,7 +137,7 @@ function Controls({
   return (
     <Container>
       <PlayContainer>
-        <Icon>
+        <Icon disabled>
           <SkipBackIcon onClick={handleBackClick} />
         </Icon>
         <Icon>
