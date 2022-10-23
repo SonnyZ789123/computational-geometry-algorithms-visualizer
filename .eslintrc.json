@@ -21,6 +21,8 @@
     "no-loop-func": "off",
     "import/prefer-default-export": "off",
     "no-await-in-loop": "off", // the delay function needs to await
+    "func-names": "off", // Anonymous naming is ok
+    "no-restricted-syntax": "off", // Uses generators in loop for algorithms
     "prettier/prettier": [
       "error",
       {

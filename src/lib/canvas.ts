@@ -58,12 +58,11 @@ export function clearCanvas(ctx: CanvasRenderingContext2D) {
 }
 
 export function readyCanvas(
-  canvasRef: React.RefObject<HTMLCanvasElement>
+  canvas: HTMLCanvasElement | null
 ): CanvasRenderingContext2D | undefined {
-  if (!canvasRef.current) {
+  if (!canvas) {
     return;
   }
-  const canvas = canvasRef.current;
   const ctx = canvas.getContext('2d');
   if (!ctx) {
     return;
