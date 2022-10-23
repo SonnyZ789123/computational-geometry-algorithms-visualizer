@@ -1,7 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+
+import styled from 'styled-components';
 import colors from '../styles/colors';
+import { convexHull } from '../routes/paths';
 
 const Nav = styled.nav`
   position: relative;
@@ -64,7 +66,18 @@ function NavBar(): JSX.Element {
       <Dropdown>
         <span>Convex Hull</span>
         <DropdownMenu>
-          <StyledLink to='/convex-hull'>Convex Hull</StyledLink>
+          <StyledLink to={`/convex-hull/${convexHull.BRUTE_FORCE}`}>
+            Brute Force
+          </StyledLink>
+          <StyledLink to={`/convex-hull/${convexHull.ANDREW}`}>
+            Andrew&apos;s Algorithm
+          </StyledLink>
+          <StyledLink to={`/convex-hull/${convexHull.GRAHAM}`}>
+            Graham&apos;s Scan
+          </StyledLink>
+          <StyledLink to={`/convex-hull/${convexHull.JARVIS}`}>
+            Jarvis&apos;s March
+          </StyledLink>
         </DropdownMenu>
       </Dropdown>
 

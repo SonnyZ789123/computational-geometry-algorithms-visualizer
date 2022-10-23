@@ -1,11 +1,9 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import GlobalStyle from './global/styles/index';
 
 import NavBar from './global/components/NavBar';
-import Home from './modules/Home';
-import ConvexHull from './modules/ConvexHull';
+import RoutesWrapper from './global/routes/RoutesWrapper';
 
 const Container = styled.div`
   margin: 0 auto;
@@ -19,12 +17,7 @@ function App(): JSX.Element {
       <GlobalStyle />
       <Container className='App'>
         <NavBar />
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/convex-hull' element={<ConvexHull />} />
-          <Route path='/line-segment-intersection' element={<Home />} />
-          <Route path='/polygon-triangulation' element={<Home />} />
-        </Routes>
+        <RoutesWrapper />
       </Container>
     </>
   );
