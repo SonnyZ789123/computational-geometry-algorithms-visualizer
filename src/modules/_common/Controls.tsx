@@ -45,9 +45,7 @@ const Input = styled.input`
 `;
 
 type ControlsProps = {
-  amount: number;
-  setAmount: React.Dispatch<React.SetStateAction<number>>;
-  randomize: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  randomize: (amount: number) => void;
   genAlgorithm: AlgorithmGenerator<{ vertices: Vertex[] }>;
   canvasElement: HTMLCanvasElement | null;
   drawBuffer: DrawBuffer;
@@ -55,8 +53,6 @@ type ControlsProps = {
 };
 
 function Controls({
-  amount,
-  setAmount,
   randomize,
   genAlgorithm,
   canvasElement,
@@ -65,6 +61,8 @@ function Controls({
 }: ControlsProps): JSX.Element {
   const [playing, setPlaying] = useState(false);
   const [delayAmount, setDelayAmount] = useState(2000); // in ms
+  const [amount, setAmount] = useState(5);
+
   const algorithm = useRef<Algorithm>();
 
   const handlePlayingClick = async () => {
@@ -107,6 +105,10 @@ function Controls({
       algorithm.current?.return;
     };
   }, [data, canvasElement]);
+
+  useEffect(() => {
+    randomize(amount);
+  }, []);
 
   return (
     <Container>
@@ -151,7 +153,7 @@ function Controls({
           max={TOTAL_POINTS / 5} // Accept less than a fifth of the total possible amount of points
         />
       </ControlContainer>
-      <Button color='secondary' onClick={randomize}>
+      <Button color='secondary' onClick={() => randomize(amount)}>
         Randomize
       </Button>
     </Container>

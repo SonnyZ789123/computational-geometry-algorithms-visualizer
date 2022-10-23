@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useCallback } from 'react';
 import {
   clearAndRedrawBuffer,
   generateRandomVertices,
@@ -16,8 +16,6 @@ import Controls from './_common/Controls';
 function ConvexHull(): JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [amount, setAmount] = useState(5);
-
   const [vertices, setVertices] = useState<Vertex[]>([]);
   const [drawBuffer, setDrawBuffer] = useState<DrawBuffer>({
     vertices: [],
@@ -31,7 +29,7 @@ function ConvexHull(): JSX.Element {
     [canvasRef.current]
   ); // We need here also the page router
 
-  const randomize = () => {
+  const randomize = useCallback((amount: number) => {
     const ctx = readyCanvas(canvasRef.current);
     if (!ctx) return;
 
@@ -46,18 +44,12 @@ function ConvexHull(): JSX.Element {
     clearAndRedrawBuffer(ctx, localDrawBuffer);
     setVertices(localVertices);
     setDrawBuffer(localDrawBuffer);
-  };
-
-  useEffect(() => {
-    randomize();
   }, []);
 
   return (
     <PageWrapper>
       <Canvas canvasRef={canvasRef} />
       <Controls
-        amount={amount}
-        setAmount={setAmount}
         randomize={randomize}
         // eslint-disable-next-line react/jsx-no-bind
         genAlgorithm={algorithmRouter}
