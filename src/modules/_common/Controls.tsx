@@ -9,7 +9,6 @@ import { ReactComponent as SkipBackIcon } from '../../assets/icons/skip-back.svg
 import { ReactComponent as SkipForwardIcon } from '../../assets/icons/skip-forward.svg';
 
 import { Button } from '../../global/components/Buttons';
-import { delay } from '../../lib/visualization';
 import { Vertex, Algorithm, AlgorithmGenerator, DrawBuffer } from '../../types';
 
 const Container = styled.div`
@@ -59,34 +58,18 @@ function Controls({
   drawBuffer,
   data,
 }: ControlsProps): JSX.Element {
+  // Controls
   const [playing, setPlaying] = useState(false);
   const [delayAmount, setDelayAmount] = useState(2000); // in ms
   const [amount, setAmount] = useState(5);
 
+  // The reference to the instance of the algorithm Iterator
   const algorithm = useRef<Algorithm>();
+  // The interval id that keeps track of the setInterval when the algorithm is playing, it is undefined when not playing.
+  const playId = useRef<NodeJS.Timer>();
 
-  const handlePlayingClick = async () => {
-    if (!algorithm.current) return;
-
-    setPlaying(true);
-
-    // Step through all the steps (yields) but wait before each yield
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const step of algorithm.current) {
-      await delay(delayAmount);
-    }
-  };
-
-  const handleBackClick = () => {};
-
-  const handleNextClick = () => {
-    if (!algorithm.current) return;
-
-    algorithm.current.next();
-  };
-
-  // We need to generate the algorithm again if the input changes
-  useEffect(() => {
+  // Initialise the algorithm Iterator ref to it's starting position
+  const initAlgorithm = () => {
     const ctx = readyCanvas(canvasElement);
     if (!ctx) return;
 
@@ -98,12 +81,47 @@ function Controls({
     };
 
     algorithm.current = genAlgorithm(ctx, localDrawBuffer, data);
+  };
 
-    return () => {
-      // Don't need the drawBuffer it returns, just return is so it's state is 'closed'.
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      algorithm.current?.return;
-    };
+  // Start the play interval
+  const handlePlayClick = () => {
+    if (!algorithm.current) return; // Maybe init algorithm?
+
+    setPlaying(true);
+
+    // Step through all the steps (yields), when it's done, stop the loop
+    playId.current = setInterval(() => {
+      if (algorithm.current?.next().done) {
+        clearInterval(playId.current);
+        setPlaying(false);
+        initAlgorithm(); // Reset the algorithm to it's starting point
+      }
+    }, delayAmount);
+  };
+
+  // Pause the play interval
+  const handlePauseClick = () => {
+    setPlaying(false);
+
+    clearInterval(playId.current);
+    playId.current = undefined;
+  };
+
+  // TODO: https://stackoverflow.com/questions/58142867/get-previous-value-from-generator-function
+  const handleBackClick = () => {};
+
+  // Step (yield) forward in the algorithm
+  const handleNextClick = () => {
+    if (!algorithm.current) return;
+
+    algorithm.current.next();
+  };
+
+  // We need to generate the algorithm again if the input changes
+  // When you play and when playing change the data, it will keep playing but starts from the beginning with the new data.
+  // Maybe keep this feature or not?
+  useEffect(() => {
+    initAlgorithm();
   }, [data, canvasElement]);
 
   useEffect(() => {
@@ -118,9 +136,9 @@ function Controls({
         </Icon>
         <Icon>
           {playing ? (
-            <PauseIcon onClick={() => setPlaying(false)} />
+            <PauseIcon onClick={handlePauseClick} />
           ) : (
-            <PlayIcon onClick={handlePlayingClick} />
+            <PlayIcon onClick={handlePlayClick} />
           )}
         </Icon>
         <Icon>

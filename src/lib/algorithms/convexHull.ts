@@ -4,12 +4,23 @@ import { relativeOrientation } from './helpers';
 import { DrawBuffer, Vertex } from '../../types';
 import colors from '../../global/styles/colors';
 
+/**
+ * Draw the convex hull of a list of vertices in a brute force manner.
+ *
+ * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
+ * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
+ * @param {{ vertices: readonly Vertex[] }} data - The data object that contains the elements for processing
+ * @returns The local drawBuffer
+ */
 export function* bruteForceConvexHull(
   ctx: CanvasRenderingContext2D,
   drawBuffer: DrawBuffer,
-  { vertices }: { vertices: Vertex[] }
+  { vertices }: { vertices: readonly Vertex[] }
 ) {
-  // local drawBuffer
+  // Force a clean context
+  clearAndRedrawBuffer(ctx, drawBuffer);
+
+  // Make a local drawBuffer
   const localDrawBuffer: DrawBuffer = {
     vertices: [...drawBuffer.vertices],
     edges: [...drawBuffer.edges],
