@@ -1,7 +1,7 @@
 import { drawDirectedEdge, clearAndRedrawBuffer } from '../canvas';
 import { relativeOrientation } from './helpers';
 
-import { DrawBuffer, Vertex } from '../../types';
+import { AlgorithmData, Algorithm, DrawBuffer } from '../../types';
 import colors from '../../global/styles/colors';
 
 /**
@@ -15,8 +15,13 @@ import colors from '../../global/styles/colors';
 export function* bruteForceConvexHull(
   ctx: CanvasRenderingContext2D,
   drawBuffer: DrawBuffer,
-  { vertices }: { vertices: readonly Vertex[] }
-) {
+  { vertices }: AlgorithmData
+): Algorithm {
+  // AlgoritmData is possible undefined
+  if (!vertices) {
+    throw new Error('Vertices is undefines');
+  }
+
   // Force a clean context
   clearAndRedrawBuffer(ctx, drawBuffer);
 

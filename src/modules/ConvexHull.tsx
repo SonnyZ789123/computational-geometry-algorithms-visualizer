@@ -29,9 +29,7 @@ function ConvexHull(): JSX.Element {
   });
 
   // Returns a Generator function based on the path that will be called to generate a Iterator
-  const algorithmRouter = useMemo<
-    AlgorithmGenerator<{ vertices: Vertex[] }>
-  >(() => {
+  const algorithmRouter = useMemo<AlgorithmGenerator>(() => {
     // TODO implement other algorithms
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { BRUTE_FORCE, ANDREW, GRAHAM, JARVIS } = convexHullIds;
@@ -48,9 +46,7 @@ function ConvexHull(): JSX.Element {
       //   // code block
       //   break;
       default:
-        return navigate('/not-found') as unknown as AlgorithmGenerator<{
-          vertices: Vertex[];
-        }>; // Dummy return type
+        return navigate('/not-found') as unknown as AlgorithmGenerator; // Dummy return type
     }
   }, [canvasRef.current]); // We need here also the page router
 

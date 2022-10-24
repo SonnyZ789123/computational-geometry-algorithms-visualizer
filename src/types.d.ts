@@ -26,13 +26,16 @@ export type DrawBuffer = {
 };
 
 // Algorithm
-export type AlgorithmData = Vertex[] | Edge[] | DirectedEdge[];
+export type AlgorithmData = {
+  vertices?: readonly Vertex[];
+  edges?: readonly Edge[];
+  directedEdges?: readonly DirectedEdge[];
+};
 
 export type Algorithm = Generator<undefined, DrawBuffer | undefined, unknown>;
 
-// DataType will be somethine like { vertices: Vertex[], ...}
-export type AlgorithmGenerator<DataType extends {}> = (
+export type AlgorithmGenerator = (
   ctx: CanvasRenderingContext2D,
   drawBuffer: DrawBuffer,
-  data: DataType
+  data: AlgorithmData
 ) => Algorithm;

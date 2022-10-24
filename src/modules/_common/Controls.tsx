@@ -9,7 +9,12 @@ import { ReactComponent as SkipBackIcon } from '../../assets/icons/skip-back.svg
 import { ReactComponent as SkipForwardIcon } from '../../assets/icons/skip-forward.svg';
 
 import { Button } from '../../global/components/Buttons';
-import { Vertex, Algorithm, AlgorithmGenerator, DrawBuffer } from '../../types';
+import {
+  Algorithm,
+  AlgorithmGenerator,
+  DrawBuffer,
+  AlgorithmData,
+} from '../../types';
 
 const Container = styled.div`
   grid-column: 10 / end;
@@ -51,10 +56,10 @@ const Input = styled.input`
 
 type ControlsProps = {
   randomize: (amount: number) => void;
-  genAlgorithm: AlgorithmGenerator<{ vertices: Vertex[] }>;
+  genAlgorithm: AlgorithmGenerator;
   canvasElement: HTMLCanvasElement | null;
   drawBuffer: DrawBuffer;
-  data: { vertices: Vertex[] };
+  data: AlgorithmData;
 };
 
 function Controls({
