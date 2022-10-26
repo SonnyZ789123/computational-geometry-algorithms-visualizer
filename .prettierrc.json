@@ -4,5 +4,6 @@
   "singleQuote": true,
   "semi": true,
   "useTabs": false,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "printWidth": 80
 }

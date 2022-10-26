@@ -5,11 +5,10 @@ import {
   generateRandomVertices,
   readyCanvas,
 } from '../lib/canvas';
-import { bruteForceConvexHull } from '../lib/algorithms/convexHull';
 
 import { AlgorithmGenerator, DrawBuffer, Vertex } from '../types';
 import colors from '../global/styles/colors';
-import { convexHull as convexHullIds } from '../global/routes/paths';
+import { polygonTriangulation as polygonTriangulationIds } from '../global/routes/paths';
 
 import PageWrapper from './_common/PageWrapper';
 import Canvas from './_common/Canvas';
@@ -19,15 +18,9 @@ const useAlgorithmRouter = () => {
   const { id } = useParams(); // The choice of algorithm
 
   const algorithmRouter = useMemo<AlgorithmGenerator>(() => {
-    const { BRUTE_FORCE, ANDREW, GRAHAM, JARVIS } = convexHullIds;
+    const { POLYGON_TRIANGULATION } = polygonTriangulationIds;
     switch (id) {
-      case BRUTE_FORCE:
-        return bruteForceConvexHull;
-      case ANDREW:
-        return undefined as unknown as AlgorithmGenerator;
-      case GRAHAM:
-        return undefined as unknown as AlgorithmGenerator;
-      case JARVIS:
+      case POLYGON_TRIANGULATION:
         return undefined as unknown as AlgorithmGenerator;
       default:
         return undefined as unknown as AlgorithmGenerator; // Dummy return type
@@ -37,7 +30,7 @@ const useAlgorithmRouter = () => {
   return algorithmRouter;
 };
 
-function ConvexHull(): JSX.Element {
+function PolygonTriangulation(): JSX.Element {
   /// /// Basic initialization
   // Reference to the HTML canvas element on which we draw
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -53,7 +46,7 @@ function ConvexHull(): JSX.Element {
   const algorithmRouter = useAlgorithmRouter();
   /// ///
 
-  const [vertices, setVertices] = useState<Vertex[]>([]);
+  const [vertices, setVertices] = useState<Vertex[]>([]); // Edges that form a simple polygon
 
   const randomize = useCallback((amount: number) => {
     const ctx = readyCanvas(canvasRef.current);
@@ -89,4 +82,4 @@ function ConvexHull(): JSX.Element {
 }
 
 // Because we pass a reference down
-export default React.forwardRef(ConvexHull);
+export default React.forwardRef(PolygonTriangulation);

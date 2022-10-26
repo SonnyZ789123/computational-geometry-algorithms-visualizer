@@ -5,6 +5,16 @@ export const convexHull = {
   JARVIS: 'jarviss-march',
 };
 
-export const LineSegmentIntersection = {};
+export const lineSegmentIntersection = {
+  BRUTE_FORCE: 'brute-force',
+  PLANE_SWEEP: 'plane-sweep',
+};
 
-export const polygonTriangulation = {};
+export const polygonTriangulation = {
+  POLYGON_TRIANGULATION: 'polygon-triangulation',
+};
+
+export const linearProgramming = {
+  HALF_PLANE: 'half-plane-intersection',
+  ENCLOSING_DISC: 'smallest-enclosing-disc',
+};

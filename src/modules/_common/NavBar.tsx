@@ -3,7 +3,12 @@ import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 import colors from '../../global/styles/colors';
-import { convexHull } from '../../global/routes/paths';
+import {
+  convexHull,
+  lineSegmentIntersection,
+  polygonTriangulation,
+  linearProgramming,
+} from '../../global/routes/paths';
 
 const Nav = styled.nav`
   position: relative;
@@ -84,8 +89,15 @@ function NavBar(): JSX.Element {
       <Dropdown>
         <span>Line Segment Intersection</span>
         <DropdownMenu>
-          <StyledLink to='/line-segment-intersection'>
-            Line Segment Intersection
+          <StyledLink
+            to={`/line-segment-intersection/${lineSegmentIntersection.BRUTE_FORCE}`}
+          >
+            Brute Force
+          </StyledLink>
+          <StyledLink
+            to={`/line-segment-intersection/${lineSegmentIntersection.PLANE_SWEEP}`}
+          >
+            Plane Sweep Algorithm
           </StyledLink>
         </DropdownMenu>
       </Dropdown>
@@ -93,8 +105,26 @@ function NavBar(): JSX.Element {
       <Dropdown>
         <span>Polygon Triangulation</span>
         <DropdownMenu>
-          <StyledLink to='/polygon-triangulation'>
+          <StyledLink
+            to={`/polygon-triangulation/${polygonTriangulation.POLYGON_TRIANGULATION}`}
+          >
             Polygon Triangulation
+          </StyledLink>
+        </DropdownMenu>
+      </Dropdown>
+
+      <Dropdown>
+        <span>Linear Programming</span>
+        <DropdownMenu>
+          <StyledLink
+            to={`/linear-programming/${linearProgramming.HALF_PLANE}`}
+          >
+            Half-Plane Intersection
+          </StyledLink>
+          <StyledLink
+            to={`/linear-programming/${linearProgramming.ENCLOSING_DISC}`}
+          >
+            Smallest Enclosing Disc
           </StyledLink>
         </DropdownMenu>
       </Dropdown>
