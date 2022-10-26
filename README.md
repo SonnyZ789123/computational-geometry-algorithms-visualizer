@@ -1,4 +1,5 @@
 # How to contribute
+small chance
 
 ## Configuration
 
