@@ -11,5 +11,4 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   }
-  // "javascript.validate.enable": false // disable ts warnings/erros, eslint already does this
 }

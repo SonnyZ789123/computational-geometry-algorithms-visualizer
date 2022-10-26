@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
-import colors from '../styles/colors';
-import { convexHull } from '../routes/paths';
+import colors from '../../global/styles/colors';
+import { convexHull } from '../../global/routes/paths';
 
 const Nav = styled.nav`
   position: relative;

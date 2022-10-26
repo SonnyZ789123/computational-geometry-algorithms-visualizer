@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import GlobalStyle from './global/styles/index';
 
-import NavBar from './global/components/NavBar';
+import NavBar from './modules/_common/NavBar';
 import RoutesWrapper from './global/routes/RoutesWrapper';
 
 const Container = styled.div`

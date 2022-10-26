@@ -1,4 +1,4 @@
-// _common
+// Primitive data types
 export type Vertex = {
   x: number;
   y: number;

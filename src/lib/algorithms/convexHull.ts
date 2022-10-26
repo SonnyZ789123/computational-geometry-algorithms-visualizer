@@ -17,9 +17,9 @@ export function* bruteForceConvexHull(
   drawBuffer: DrawBuffer,
   { vertices }: AlgorithmData
 ): Algorithm {
-  // AlgoritmData is possible undefined
+  // AlgoritmData is possibly undefined
   if (!vertices) {
-    throw new Error('Vertices is undefines');
+    throw new Error('Vertices is undefined');
   }
 
   // Force a clean context
@@ -88,13 +88,7 @@ export function* bruteForceConvexHull(
   return localDrawBuffer;
 }
 
-/**
- *
- * @param {Set<Vertex>} vertices - A set P of points in the plane
- *
- * @returns {Vertex[]} A list containing the vertices of the convex hull in clockwise order
- */
-// export function AndrewConvexHull(vertices: Set<Vertex>): Vertex[] {}
+// function AndrewConvexHull(vertices: Set<Vertex>): Vertex[] {}
 
 /**
  *
