@@ -1,5 +1,5 @@
 import React, { useRef, useState, useMemo, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import {
   clearAndRedrawBuffer,
   generateRandomVertices,
@@ -15,9 +15,31 @@ import PageWrapper from './_common/PageWrapper';
 import Canvas from './_common/Canvas';
 import Controls from './_common/Controls';
 
-function ConvexHull(): JSX.Element {
-  const navigate = useNavigate(); // For redirecting if the id (choice of algorithm) is not valid
+const useAlgorithmRouter = () => {
   const { id } = useParams(); // The choice of algorithm
+
+  const algorithmRouter = useMemo<AlgorithmGenerator>(() => {
+    // TODO implement other algorithms
+    const { BRUTE_FORCE, ANDREW, GRAHAM, JARVIS } = convexHullIds;
+    switch (id) {
+      case BRUTE_FORCE:
+        return bruteForceConvexHull;
+      case ANDREW:
+        return undefined as unknown as AlgorithmGenerator;
+      case GRAHAM:
+        return undefined as unknown as AlgorithmGenerator;
+      case JARVIS:
+        return undefined as unknown as AlgorithmGenerator;
+      default:
+        return undefined as unknown as AlgorithmGenerator; // Dummy return type
+    }
+  }, [id]);
+
+  return algorithmRouter;
+};
+
+function ConvexHull(): JSX.Element {
+  const algorithmRouter = useAlgorithmRouter();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -27,28 +49,6 @@ function ConvexHull(): JSX.Element {
     edges: [],
     directedEdges: [],
   });
-
-  // Returns a Generator function based on the path that will be called to generate a Iterator
-  const algorithmRouter = useMemo<AlgorithmGenerator>(() => {
-    // TODO implement other algorithms
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { BRUTE_FORCE, ANDREW, GRAHAM, JARVIS } = convexHullIds;
-    switch (id) {
-      case BRUTE_FORCE:
-        return bruteForceConvexHull;
-      // case ANDREW:
-      //   // code block
-      //   break;
-      // case GRAHAM:
-      //   // code block
-      //   break;
-      // case JARVIS:
-      //   // code block
-      //   break;
-      default:
-        return navigate('/not-found') as unknown as AlgorithmGenerator; // Dummy return type
-    }
-  }, [canvasRef.current]); // We need here also the page router
 
   const randomize = useCallback((amount: number) => {
     const ctx = readyCanvas(canvasRef.current);
@@ -67,7 +67,9 @@ function ConvexHull(): JSX.Element {
     setDrawBuffer(localDrawBuffer);
   }, []);
 
-  return (
+  return !algorithmRouter ? (
+    <Navigate to='/not-found' />
+  ) : (
     <PageWrapper>
       <Canvas canvasRef={canvasRef} />
       <Controls
@@ -83,5 +85,4 @@ function ConvexHull(): JSX.Element {
 }
 
 // Because we pass a reference down
-// export default ConvexHull;
 export default React.forwardRef(ConvexHull);
