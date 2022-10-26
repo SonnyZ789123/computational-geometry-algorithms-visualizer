@@ -131,6 +131,16 @@ drawEdge
 drawDirectedEdge
 : Draws an arrow.
 
+## Git Workflow
+
+### contributing Guide
+
+[Step-by-step guide to contributing on GitHub](https://www.dataschool.io/how-to-contribute-on-github/)
+
+### Branch conventions
+
+A branch represents an issue. With the issue comes some additional information and guidelines.
+
 # File structure
 
 All the code is in the /src folder, all the config files are in the root folder of the project.
