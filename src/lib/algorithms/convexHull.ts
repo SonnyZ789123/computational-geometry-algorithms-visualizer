@@ -1,5 +1,5 @@
 import { drawDirectedEdge, clearAndRedrawBuffer } from '../canvas';
-import { relativeOrientation } from './helpers';
+import { relativeOrientation } from './_helpers';
 
 import { AlgorithmData, Algorithm, DrawBuffer } from '../../types';
 import colors from '../../global/styles/colors';

@@ -141,6 +141,8 @@ drawDirectedEdge
 
 A branch represents an issue. With the issue comes some additional information and guidelines.
 
+When you decide to contribute to an issue, you make a new branch with the name "feature/<#ticketnr>-\<abvoftitle\>". So image there is an issue with the title "Convex Hull - Andrew's Algorithm implementation #1", this case the ticketnr is #1 so the branch name will be "feature/#1-convex-hull-andrew". You also assign yourself to the issue so others know you're already working on it.
+
 # File structure
 
 All the code is in the /src folder, all the config files are in the root folder of the project.

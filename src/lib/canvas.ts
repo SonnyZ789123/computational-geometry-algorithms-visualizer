@@ -150,17 +150,22 @@ export function clearAndRedrawBuffer(
 /// /////////
 // Generators
 /// /////////
+function generateRandomPoint() {
+  // First scale to integers, pick a random number between all possible x-coo, then scale back to right size
+  const x = Math.floor(Math.random() * (CANVAS_WIDTH / MIN_DELTA)) * MIN_DELTA;
+  const y = Math.floor(Math.random() * (CANVAS_HEIGHT / MIN_DELTA)) * MIN_DELTA;
+
+  return { x, y };
+}
+
 export function generateRandomVertices(amount: number) {
   const vertices: Vertex[] = [];
 
   for (let i = 0; i < amount; i += 1) {
-    const x =
-      Math.floor(Math.random() * (CANVAS_WIDTH / MIN_DELTA)) * MIN_DELTA; // First scale to integers, pick a rondom number between all possible x-coo, then scale back to right size
-    const y =
-      Math.floor(Math.random() * (CANVAS_HEIGHT / MIN_DELTA)) * MIN_DELTA;
+    const p = generateRandomPoint();
 
-    if (!vertices.find((v) => v.x === x && v.y === y)) {
-      vertices.push({ x, y });
+    if (!vertices.find((v) => v.x === p.x && v.y === p.y)) {
+      vertices.push(p);
     } else {
       i -= 1;
     }
@@ -168,3 +173,36 @@ export function generateRandomVertices(amount: number) {
 
   return vertices;
 }
+
+export function generateRandomEdges(amount: number) {
+  const edges: Edge[] = [];
+
+  for (let i = 0; i < amount; i += 1) {
+    const p1 = generateRandomPoint();
+    const p2 = generateRandomPoint();
+
+    if (
+      !edges.find(
+        (e) =>
+          e[0].x === p1.x &&
+          e[0].y === p1.y &&
+          e[1].x === p2.x &&
+          e[1].y === p2.y
+      )
+    ) {
+      edges.push([p1, p2]);
+    } else {
+      i -= 1;
+    }
+  }
+
+  return edges;
+}
+
+/**
+ * Generate a simple polygon, thus with no intersecting edges.
+ *
+ * @param {number} _amount - The amount of edges the polygon consists of
+ * @returns {DirectedEdge[]} The edges of the simple polygon in clockwise order
+ */
+export function generateSimplePolygon(amount: number) {}
