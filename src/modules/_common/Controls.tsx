@@ -94,6 +94,14 @@ function Controls({
     algorithm.current = genAlgorithm(ctx, localDrawBuffer, data);
   };
 
+  // Reset the algorithm to starting position and pause
+  const resetAlgorithm = () => {
+    clearInterval(playId.current);
+    playId.current = undefined;
+    setPlaying(false);
+    initAlgorithm(); // Reset the algorithm to it's starting point
+  };
+
   // Start the play interval
   const handlePlayClick = () => {
     if (!algorithm.current) return; // Maybe init algorithm?
@@ -103,9 +111,7 @@ function Controls({
     // Step through all the steps (yields), when it's done, stop the loop
     playId.current = setInterval(() => {
       if (algorithm.current?.next().done) {
-        clearInterval(playId.current);
-        setPlaying(false);
-        initAlgorithm(); // Reset the algorithm to it's starting point
+        resetAlgorithm();
       }
     }, delayAmount);
   };
@@ -125,7 +131,9 @@ function Controls({
   const handleNextClick = () => {
     if (!algorithm.current) return;
 
-    algorithm.current.next();
+    if (algorithm.current?.next().done) {
+      resetAlgorithm();
+    }
   };
 
   // We need to generate the algorithm again if the input changes
