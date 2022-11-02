@@ -282,8 +282,6 @@ export function* grahamConvexHull(
   sortedVertices.splice(minYIndex, 1); // Remove the base vertex with the lowes y-coordinate
   const n = sortedVertices.length;
 
-  console.log('-----------------------------');
-  console.log(sortedVertices);
   // Sort based on polar angle
   sortedVertices.sort((v1, v2) =>
     polarAngle(v0, v1) < polarAngle(v0, v2) ? -1 : 1

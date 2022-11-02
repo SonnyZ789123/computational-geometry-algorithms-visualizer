@@ -109,10 +109,5 @@ export function polarAngle(base: Vertex, target: Vertex) {
   const x = target.x - base.x;
   const y = target.y - base.y;
 
-  console.log('target', target);
-  console.log('x', x);
-  console.log('y', y);
-  console.log('atan', Math.atan(y / x));
-
   return Math.abs(Math.atan(y / x));
 }
