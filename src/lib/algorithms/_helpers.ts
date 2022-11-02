@@ -96,3 +96,23 @@ export function intersectLines(line1: Line, line2: Line): boolean {
     (orientation1 <= 0 && orientation2 >= 0)
   );
 }
+
+/**
+ * Calculates the polarAngle relative of a base vertex.
+ * You can see the base vertex as the zero coordinate.
+ *
+ * @param {Vertex} base - The base vertex, the zero coordinate
+ * @param {Vertex} target - The target vertex
+ * @returns {number} the polar angle
+ */
+export function polarAngle(base: Vertex, target: Vertex) {
+  const x = target.x - base.x;
+  const y = target.y - base.y;
+
+  console.log('target', target);
+  console.log('x', x);
+  console.log('y', y);
+  console.log('atan', Math.atan(y / x));
+
+  return Math.abs(Math.atan(y / x));
+}
