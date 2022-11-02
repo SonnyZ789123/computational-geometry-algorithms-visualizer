@@ -1,8 +1,15 @@
 import { drawDirectedEdge, clearAndRedrawBuffer } from '../canvas';
-import { relativeOrientation } from './_helpers';
+import { relativeOrientation, turnOrientation } from './_helpers';
 
 import { AlgorithmData, Algorithm, DrawBuffer } from '../../types';
 import colors from '../../global/styles/colors';
+
+// Define some uniform colors
+const CURRENT = colors.white;
+const OTHER = colors.lightGrey;
+const SUCCESS = colors.lightGreen;
+const FAIL = colors.red;
+const CONVEX = colors.yellow;
 
 /**
  * Draw the convex hull of a list of vertices in a brute force manner.
@@ -10,7 +17,7 @@ import colors from '../../global/styles/colors';
  * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
  * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
  * @param {{ vertices: readonly Vertex[] }} data - The data object that contains the elements for processing
- * @returns The local drawBuffer
+ * @returns {DrawBuffer} The local drawBuffer
  */
 export function* bruteForceConvexHull(
   ctx: CanvasRenderingContext2D,
@@ -41,10 +48,10 @@ export function* bruteForceConvexHull(
       let valid = true;
       const e1 = { from: vertices[i], to: vertices[j] };
 
-      drawDirectedEdge(ctx, e1, colors.white);
+      drawDirectedEdge(ctx, e1, CURRENT);
       localDrawBuffer.directedEdges.push({
         value: e1,
-        color: colors.white,
+        color: CURRENT,
       });
       yield;
 
@@ -58,13 +65,13 @@ export function* bruteForceConvexHull(
         // Testing if it lies on the left of the processed edge
         if (relativeOrientation(e1, e2) >= 0) {
           valid = false;
-          drawDirectedEdge(ctx, e2, colors.red);
+          drawDirectedEdge(ctx, e2, FAIL);
           // Do not add to drawBuffer
           yield;
 
           break;
         } else {
-          drawDirectedEdge(ctx, e2, colors.secondary);
+          drawDirectedEdge(ctx, e2, SUCCESS);
           // Do not add to drawBuffer
           yield;
         }
@@ -76,7 +83,7 @@ export function* bruteForceConvexHull(
       if (valid) {
         localDrawBuffer.directedEdges.push({
           value: e1,
-          color: colors.yellow,
+          color: CONVEX,
         });
       }
 
@@ -84,6 +91,154 @@ export function* bruteForceConvexHull(
       clearAndRedrawBuffer(ctx, localDrawBuffer);
     }
   }
+
+  return localDrawBuffer;
+}
+
+/**
+ * Draw the convex hull of a list of vertices with Andrew's Algorithm.
+ *
+ * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
+ * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
+ * @param {{ vertices: readonly Vertex[] }} data - The data object that contains the elements for processing
+ * @returns {DrawBuffer} The local drawBuffer
+ */
+export function* andrewConvexHull(
+  ctx: CanvasRenderingContext2D,
+  drawBuffer: DrawBuffer,
+  { vertices }: AlgorithmData
+): Algorithm {
+  // AlgoritmData is possibly undefined
+  if (!vertices) {
+    throw new Error('Vertices is undefined');
+  }
+
+  // Force a clean context
+  clearAndRedrawBuffer(ctx, drawBuffer);
+
+  // Make a local drawBuffer
+  const localDrawBuffer: DrawBuffer = {
+    vertices: [...drawBuffer.vertices],
+    edges: [...drawBuffer.edges],
+    directedEdges: [...drawBuffer.directedEdges],
+  };
+
+  const sortedVertices = [...vertices]; // copy the vertices
+  const n = sortedVertices.length;
+
+  // Sort based on x value
+  sortedVertices.sort((v1, v2) => (v1.x < v2.x ? -1 : 1));
+
+  // UPPER HULL
+  const upper = [sortedVertices[0], sortedVertices[1]];
+  drawDirectedEdge(
+    ctx,
+    { from: sortedVertices[0], to: sortedVertices[1] },
+    CONVEX
+  );
+  localDrawBuffer.directedEdges.push({
+    value: { from: sortedVertices[0], to: sortedVertices[1] },
+    color: CONVEX,
+  });
+  yield;
+  for (let i = 2; i < n; i += 1) {
+    upper.push(sortedVertices[i]);
+
+    let upperLength = upper.length;
+    let v1 = upper[upperLength - 3];
+    let v2 = upper[upperLength - 2];
+    let v3 = upper[upperLength - 1];
+
+    drawDirectedEdge(ctx, { from: v2, to: v3 }, OTHER);
+    localDrawBuffer.directedEdges.push({
+      value: { from: v2, to: v3 },
+      color: OTHER,
+    });
+    yield;
+
+    // While the next edge makes a left turn, delete the second last vertex.
+    // So the upper contains only vertices that continually make right turns.
+    while (
+      upperLength > 2 &&
+      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
+    ) {
+      drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
+      upper.splice(upperLength - 2, 1); // Delete the middle vertex
+      upperLength -= 1;
+      yield;
+
+      // Pop that edge that was faulty part of the convex hull
+      localDrawBuffer.directedEdges.pop();
+
+      v1 = upper[upperLength - 3];
+      v2 = upper[upperLength - 2];
+      v3 = upper[upperLength - 1];
+    }
+
+    // Pop the "other" edge which we maybe backtracked from
+    localDrawBuffer.directedEdges.pop();
+    // Push the actual edge that is maybe part of the convex hull
+    localDrawBuffer.directedEdges.push({
+      value: { from: v2, to: v3 },
+      color: CONVEX,
+    });
+    clearAndRedrawBuffer(ctx, localDrawBuffer);
+  }
+
+  // LOWER HULL
+  // The same but now we start from highest x-values
+  const lower = [sortedVertices[n - 1], sortedVertices[n - 2]];
+  drawDirectedEdge(
+    ctx,
+    { from: sortedVertices[n - 1], to: sortedVertices[n - 2] },
+    CONVEX
+  );
+  localDrawBuffer.directedEdges.push({
+    value: { from: sortedVertices[n - 1], to: sortedVertices[n - 2] },
+    color: CONVEX,
+  });
+  yield;
+  for (let i = n - 3; i >= 0; i -= 1) {
+    lower.push(sortedVertices[i]);
+
+    let lowerLength = lower.length;
+    let v1 = lower[lowerLength - 3];
+    let v2 = lower[lowerLength - 2];
+    let v3 = lower[lowerLength - 1];
+
+    drawDirectedEdge(ctx, { from: v2, to: v3 }, OTHER);
+    localDrawBuffer.directedEdges.push({
+      value: { from: v2, to: v3 },
+      color: OTHER,
+    });
+    yield;
+
+    while (
+      lowerLength > 2 &&
+      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
+    ) {
+      drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
+      lower.splice(lowerLength - 2, 1);
+      lowerLength -= 1;
+      yield;
+
+      localDrawBuffer.directedEdges.pop();
+
+      v1 = lower[lowerLength - 3];
+      v2 = lower[lowerLength - 2];
+      v3 = lower[lowerLength - 1];
+    }
+
+    localDrawBuffer.directedEdges.pop();
+    localDrawBuffer.directedEdges.push({
+      value: { from: v2, to: v3 },
+      color: CONVEX,
+    });
+    clearAndRedrawBuffer(ctx, localDrawBuffer);
+  }
+
+  // At the end we actually need to concat upper and lower (lower without first
+  // and last vertex)
 
   return localDrawBuffer;
 }

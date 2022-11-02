@@ -5,7 +5,10 @@ import {
   generateRandomVertices,
   readyCanvas,
 } from '../lib/canvas';
-import { bruteForceConvexHull } from '../lib/algorithms/convexHull';
+import {
+  andrewConvexHull,
+  bruteForceConvexHull,
+} from '../lib/algorithms/convexHull';
 
 import { AlgorithmGenerator, DrawBuffer, Vertex } from '../types';
 import colors from '../global/styles/colors';
@@ -24,7 +27,7 @@ const useAlgorithmRouter = () => {
       case BRUTE_FORCE:
         return bruteForceConvexHull;
       case ANDREW:
-        return undefined as unknown as AlgorithmGenerator;
+        return andrewConvexHull;
       case GRAHAM:
         return undefined as unknown as AlgorithmGenerator;
       case JARVIS:
