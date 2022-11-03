@@ -309,6 +309,70 @@ export function* grahamConvexHull(
     });
     yield;
 
+    // While the next edge makes a left turn, delete the second last vertex.
+    // So the upper contains only vertices that continually make right turns.
+    while (
+      upperLength > 2 &&
+      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
+    ) {
+      drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
+      convexHull.splice(upperLength - 2, 1); // Delete the middle vertex
+      upperLength -= 1;
+      yield;
+
+      // Pop that edge that was faulty part of the convex hull
+      localDrawBuffer.directedEdges.pop();
+
+      v1 = convexHull[upperLength - 3];
+      v2 = convexHull[upperLength - 2];
+      v3 = convexHull[upperLength - 1];
+    }
+
+    // Pop the "other" edge which we maybe backtracked from
+    localDrawBuffer.directedEdges.pop();
+    // Push the actual edge that is maybe part of the convex hull
+    localDrawBuffer.directedEdges.push({
+      value: { from: v2, to: v3 },
+      color: CONVEX,
+    });
+    clearAndRedrawBuffer(ctx, localDrawBuffer);
+  }
+
+  // Draw a last edge to connect the last one with the base vertex
+  drawDirectedEdge(
+    ctx,
+    { from: convexHull[convexHull.length - 1], to: v0 },
+    CONVEX
+  );
+  localDrawBuffer.directedEdges.push({
+    value: { from: convexHull[convexHull.length - 1], to: v0 },
+    color: CONVEX,
+  });
+  yield;
+
+  return localDrawBuffer;
+  const convexHull = [v0, sortedVertices[0]];
+  drawDirectedEdge(ctx, { from: v0, to: sortedVertices[0] }, CONVEX);
+  localDrawBuffer.directedEdges.push({
+    value: { from: v0, to: sortedVertices[0] },
+    color: CONVEX,
+  });
+  yield;
+  for (let i = 1; i < n; i += 1) {
+    convexHull.push(sortedVertices[i]);
+
+    let upperLength = convexHull.length;
+    let v1 = convexHull[upperLength - 3];
+    let v2 = convexHull[upperLength - 2];
+    let v3 = convexHull[upperLength - 1];
+
+    drawDirectedEdge(ctx, { from: v2, to: v3 }, OTHER);
+    localDrawBuffer.directedEdges.push({
+      value: { from: v2, to: v3 },
+      color: OTHER,
+    });
+    yield;
+
     // While the next edge makes a right turn, delete the second last vertex.
     // So the upper contains only vertices that continually make left turns.
     while (
