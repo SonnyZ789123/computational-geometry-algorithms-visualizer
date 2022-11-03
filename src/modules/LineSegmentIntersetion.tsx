@@ -17,15 +17,27 @@ import Controls from './_common/Controls';
 const useAlgorithmRouter = () => {
   const { id } = useParams(); // The choice of algorithm
 
-  const algorithmRouter = useMemo<AlgorithmGenerator>(() => {
+  const algorithmRouter = useMemo<{
+    title: string;
+    algorithm: AlgorithmGenerator;
+  }>(() => {
     const { BRUTE_FORCE, PLANE_SWEEP } = lineSegmentIntersectionIds;
     switch (id) {
       case BRUTE_FORCE:
-        return undefined as unknown as AlgorithmGenerator;
+        return {
+          title: 'Brute Force Line Sgement Intersection',
+          algorithm: undefined as unknown as AlgorithmGenerator,
+        };
       case PLANE_SWEEP:
-        return undefined as unknown as AlgorithmGenerator;
+        return {
+          title: 'Plane Sweep Algorithm',
+          algorithm: undefined as unknown as AlgorithmGenerator,
+        };
       default:
-        return undefined as unknown as AlgorithmGenerator; // Dummy return type
+        return undefined as unknown as {
+          title: string;
+          algorithm: AlgorithmGenerator;
+        }; // Dummy return type
     }
   }, [id]);
 
@@ -67,14 +79,15 @@ function LineSegmentIntersection(): JSX.Element {
     setDrawBuffer(localDrawBuffer);
   }, []);
 
-  return !algorithmRouter ? (
+  return !algorithmRouter.algorithm ? (
     <Navigate to='/not-found' />
   ) : (
     <PageWrapper>
       <Canvas canvasRef={canvasRef} />
       <Controls
+        algorithmTitle={algorithmRouter.title}
         randomize={randomize}
-        genAlgorithm={algorithmRouter}
+        genAlgorithm={algorithmRouter.algorithm}
         canvasElement={canvasRef.current}
         drawBuffer={drawBuffer}
         data={{ vertices }}

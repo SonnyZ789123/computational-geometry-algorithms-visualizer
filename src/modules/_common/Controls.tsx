@@ -70,6 +70,7 @@ const Input = styled.input`
 `;
 
 type ControlsProps = {
+  algorithmTitle: string;
   randomize: (amount: number) => void;
   genAlgorithm: AlgorithmGenerator;
   canvasElement: HTMLCanvasElement | null;
@@ -78,6 +79,7 @@ type ControlsProps = {
 };
 
 function Controls({
+  algorithmTitle,
   randomize,
   genAlgorithm,
   canvasElement,
@@ -171,6 +173,7 @@ function Controls({
 
   return (
     <Container>
+      <AlgorithmTitle>{algorithmTitle}</AlgorithmTitle>
       <PlayContainer>
         <Icon disabled>
           <SkipBackIcon onClick={handleBackClick} />

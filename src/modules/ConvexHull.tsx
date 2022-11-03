@@ -23,19 +23,28 @@ import Controls from './_common/Controls';
 const useAlgorithmRouter = () => {
   const { id } = useParams(); // The choice of algorithm
 
-  const algorithmRouter = useMemo<AlgorithmGenerator>(() => {
+  const algorithmRouter = useMemo<{
+    title: string;
+    algorithm: AlgorithmGenerator;
+  }>(() => {
     const { BRUTE_FORCE, ANDREW, GRAHAM, JARVIS } = convexHullIds;
     switch (id) {
       case BRUTE_FORCE:
-        return bruteForceConvexHull;
+        return {
+          title: 'Brute Force Convex Hull',
+          algorithm: bruteForceConvexHull,
+        };
       case ANDREW:
-        return andrewConvexHull;
+        return { title: "Andrew's Algorithm", algorithm: andrewConvexHull };
       case GRAHAM:
-        return grahamConvexHull;
+        return { title: "Graham's Scan", algorithm: grahamConvexHull };
       case JARVIS:
-        return jarvisConvexHull;
+        return { title: "Jarvis' March", algorithm: jarvisConvexHull };
       default:
-        return undefined as unknown as AlgorithmGenerator; // Dummy return type
+        return undefined as unknown as {
+          title: string;
+          algorithm: AlgorithmGenerator;
+        }; // Dummy return type
     }
   }, [id]);
 
@@ -77,14 +86,15 @@ function ConvexHull(): JSX.Element {
     setDrawBuffer(localDrawBuffer);
   }, []);
 
-  return !algorithmRouter ? (
+  return !algorithmRouter.algorithm ? (
     <Navigate to='/not-found' />
   ) : (
     <PageWrapper>
       <Canvas canvasRef={canvasRef} />
       <Controls
+        algorithmTitle={algorithmRouter.title}
         randomize={randomize}
-        genAlgorithm={algorithmRouter}
+        genAlgorithm={algorithmRouter.algorithm}
         canvasElement={canvasRef.current}
         drawBuffer={drawBuffer}
         data={{ vertices }}
