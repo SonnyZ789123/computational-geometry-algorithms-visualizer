@@ -1,4 +1,4 @@
-import { drawDirectedEdge, clearAndRedrawBuffer } from '../canvas';
+import { drawDirectedEdge, clearAndRedrawBuffer, drawText } from '../canvas';
 import { polarAngle, relativeOrientation, turnOrientation } from './_helpers';
 
 import { AlgorithmData, Algorithm, DrawBuffer, Vertex } from '../../types';
@@ -37,6 +37,7 @@ export function* bruteForceConvexHull(
     vertices: [...drawBuffer.vertices],
     edges: [...drawBuffer.edges],
     directedEdges: [...drawBuffer.directedEdges],
+    text: [...drawBuffer.text],
   };
 
   for (let i = 0; i < vertices.length; i += 1) {
@@ -121,6 +122,7 @@ export function* andrewConvexHull(
     vertices: [...drawBuffer.vertices],
     edges: [...drawBuffer.edges],
     directedEdges: [...drawBuffer.directedEdges],
+    text: [...drawBuffer.text],
   };
 
   const sortedVertices = [...vertices]; // copy the vertices
@@ -128,6 +130,14 @@ export function* andrewConvexHull(
 
   // Sort based on x value
   sortedVertices.sort((v1, v2) => (v1.x < v2.x ? -1 : 1));
+  sortedVertices.forEach((v, i) => {
+    drawText(ctx, v, i.toString(), OTHER);
+    localDrawBuffer.text.push({
+      value: { position: v, text: i.toString() },
+      color: OTHER,
+    });
+  });
+  yield;
 
   // UPPER HULL
   const upper = [sortedVertices[0], sortedVertices[1]];
@@ -141,6 +151,7 @@ export function* andrewConvexHull(
     color: CONVEX,
   });
   yield;
+
   for (let i = 2; i < n; i += 1) {
     upper.push(sortedVertices[i]);
 
@@ -183,6 +194,7 @@ export function* andrewConvexHull(
       color: CONVEX,
     });
     clearAndRedrawBuffer(ctx, localDrawBuffer);
+    yield;
   }
 
   // LOWER HULL
@@ -198,6 +210,7 @@ export function* andrewConvexHull(
     color: CONVEX,
   });
   yield;
+
   for (let i = n - 3; i >= 0; i -= 1) {
     lower.push(sortedVertices[i]);
 
@@ -235,6 +248,7 @@ export function* andrewConvexHull(
       color: CONVEX,
     });
     clearAndRedrawBuffer(ctx, localDrawBuffer);
+    yield;
   }
 
   // At the end we actually need to concat upper and lower (lower without first
@@ -269,6 +283,7 @@ export function* grahamConvexHull(
     vertices: [...drawBuffer.vertices],
     edges: [...drawBuffer.edges],
     directedEdges: [...drawBuffer.directedEdges],
+    text: [...drawBuffer.text],
   };
 
   // Find the vertex with the lowest y coordinate
@@ -286,6 +301,14 @@ export function* grahamConvexHull(
   sortedVertices.sort((v1, v2) =>
     polarAngle(v0, v1) < polarAngle(v0, v2) ? -1 : 1
   );
+  sortedVertices.forEach((v, i) => {
+    drawText(ctx, v, i.toString(), OTHER);
+    localDrawBuffer.text.push({
+      value: { position: v, text: i.toString() },
+      color: OTHER,
+    });
+  });
+  yield;
 
   const convexHull = [v0, sortedVertices[0]];
   drawDirectedEdge(ctx, { from: v0, to: sortedVertices[0] }, CONVEX);
@@ -354,7 +377,7 @@ export function* grahamConvexHull(
 }
 
 /**
- * Draw the convex hull of a list of vertices with Jarvis's March.
+ * Draw the convex hull of a list of vertices with Jarvis' March.
  *
  * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
  * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
@@ -379,6 +402,7 @@ export function* jarvisConvexHull(
     vertices: [...drawBuffer.vertices],
     edges: [...drawBuffer.edges],
     directedEdges: [...drawBuffer.directedEdges],
+    text: [...drawBuffer.text],
   };
 
   // Find the vertex with the lowest y coordinate
@@ -414,6 +438,9 @@ export function* jarvisConvexHull(
   // Goes till it reaches the highest vertex
   for (let i = 0; i < n; i += 1) {
     sortPolarAngle(base, rest);
+    rest.forEach((v, index) => drawText(ctx, v, index.toString(), OTHER));
+    drawText(ctx, rest[0], '0', CONVEX);
+    yield;
 
     drawDirectedEdge(ctx, { from: base, to: rest[0] }, CONVEX);
     localDrawBuffer.directedEdges.push({
@@ -425,6 +452,8 @@ export function* jarvisConvexHull(
     const temp = base;
     [base] = rest;
     rest = [...rest.slice(1), temp];
+
+    clearAndRedrawBuffer(ctx, localDrawBuffer);
 
     if (base === maxY) {
       break;
@@ -435,17 +464,22 @@ export function* jarvisConvexHull(
     // We need to multiply the x and y of target - base vertex with -1
     // -result = target - base => result = -target - -base
     sortPolarAngle({ x: -base.x, y: -base.y }, rest, -1);
+    rest.forEach((v, index) => drawText(ctx, v, index.toString(), OTHER));
+    drawText(ctx, rest[0], '0', CONVEX);
+    yield;
 
     drawDirectedEdge(ctx, { from: base, to: rest[0] }, CONVEX);
     localDrawBuffer.directedEdges.push({
       value: { from: base, to: rest[0] },
       color: CONVEX,
     });
-
     yield;
+
     const temp = base;
     [base] = rest;
     rest = [...rest.slice(1), temp];
+
+    clearAndRedrawBuffer(ctx, localDrawBuffer);
 
     if (base === v0) {
       break;

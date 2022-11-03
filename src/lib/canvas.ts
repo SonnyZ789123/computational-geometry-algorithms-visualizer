@@ -119,6 +119,18 @@ export function drawDirectedEdge(
   ctx.stroke();
 }
 
+export function drawText(
+  ctx: CanvasRenderingContext2D,
+  v: Vertex,
+  text: string,
+  color: string
+) {
+  ctx.fillStyle = color;
+  ctx.font = `${GRID_SIZE * 1.2}px Arial`;
+  // Draw the number a grid element to the right and under
+  ctx.fillText(text, v.x + GRID_SIZE, v.y + GRID_SIZE);
+}
+
 export function redrawBuffer(
   ctx: CanvasRenderingContext2D,
   drawBuffer: DrawBuffer
@@ -135,6 +147,14 @@ export function redrawBuffer(
       ctx,
       drawBuffer.directedEdges[i].value,
       drawBuffer.directedEdges[i].color
+    );
+  }
+  for (let i = 0; i < drawBuffer.text.length; i += 1) {
+    drawText(
+      ctx,
+      drawBuffer.text[i].value.position,
+      drawBuffer.text[i].value.text,
+      drawBuffer.text[i].color
     );
   }
 }

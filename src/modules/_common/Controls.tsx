@@ -106,6 +106,7 @@ function Controls({
       vertices: [...drawBuffer.vertices],
       edges: [...drawBuffer.edges],
       directedEdges: [...drawBuffer.directedEdges],
+      text: [...drawBuffer.text],
     };
 
     clearAndRedrawBuffer(ctx, localDrawBuffer);

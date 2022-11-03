@@ -23,6 +23,7 @@ export type DrawBuffer = {
   vertices: { value: Vertex; color: string }[];
   edges: { value: Edge; color: string }[];
   directedEdges: { value: Directed; color: string }[];
+  text: { value: { position: Vertex; text: string }; color: string }[];
 };
 
 // Algorithm
