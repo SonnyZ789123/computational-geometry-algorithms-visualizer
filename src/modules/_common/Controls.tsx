@@ -1,12 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import colors from '../../global/styles/colors';
-import { readyCanvas, TOTAL_POINTS } from '../../lib/canvas';
+import {
+  clearAndRedrawBuffer,
+  readyCanvas,
+  TOTAL_POINTS,
+} from '../../lib/canvas';
 
 import { ReactComponent as PlayIcon } from '../../assets/icons/play.svg';
 import { ReactComponent as PauseIcon } from '../../assets/icons/pause.svg';
 import { ReactComponent as SkipBackIcon } from '../../assets/icons/skip-back.svg';
 import { ReactComponent as SkipForwardIcon } from '../../assets/icons/skip-forward.svg';
+import { ReactComponent as RefreshIcon } from '../../assets/icons/refresh.svg';
 
 import { Button } from '../../global/components/Buttons';
 import {
@@ -21,6 +26,16 @@ const Container = styled.div`
   display: flex;
   flex-flow: column nowrap;
   gap: 1.5rem;
+`;
+
+const AlgorithmTitle = styled.h1`
+  margin: 0;
+  text-decoration: underline;
+  text-decoration-color: ${colors.primary};
+  text-underline-offset: 0.5rem;
+  color: ${colors.light};
+  font-size: 1.5rem;
+  text-align: center;
 `;
 
 const PlayContainer = styled.div`
@@ -91,6 +106,8 @@ function Controls({
       directedEdges: [...drawBuffer.directedEdges],
     };
 
+    clearAndRedrawBuffer(ctx, localDrawBuffer);
+
     algorithm.current = genAlgorithm(ctx, localDrawBuffer, data);
   };
 
@@ -136,6 +153,11 @@ function Controls({
     }
   };
 
+  // Refresh the algorithm to its starting state
+  const handleRefreshClick = () => {
+    resetAlgorithm();
+  };
+
   // We need to generate the algorithm again if the input changes
   // When you play and when playing change the data, it will keep playing but starts from the beginning with the new data.
   // Maybe keep this feature or not?
@@ -164,6 +186,9 @@ function Controls({
           <SkipForwardIcon onClick={handleNextClick} />
         </Icon>
       </PlayContainer>
+      <Icon>
+        <RefreshIcon onClick={handleRefreshClick} />
+      </Icon>
       <ControlContainer>
         <Description htmlFor='delay'>Delay:</Description>
         <Input
