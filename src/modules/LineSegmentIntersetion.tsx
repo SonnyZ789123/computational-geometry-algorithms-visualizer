@@ -54,6 +54,7 @@ function LineSegmentIntersection(): JSX.Element {
     vertices: [],
     edges: [],
     directedEdges: [],
+    text: [],
   });
 
   // Router which inspects the id in the url path and selects the corresponding algorithm
@@ -73,6 +74,7 @@ function LineSegmentIntersection(): JSX.Element {
       ],
       edges: [],
       directedEdges: [],
+      text: [],
     };
     clearAndRedrawBuffer(ctx, localDrawBuffer);
     setVertices(localVertices);
