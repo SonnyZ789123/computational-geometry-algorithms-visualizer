@@ -103,11 +103,38 @@ export function intersectLines(line1: Line, line2: Line): boolean {
  *
  * @param {Vertex} base - The base vertex, the zero coordinate
  * @param {Vertex} target - The target vertex
- * @returns {number} the polar angle
+ * @returns {number} - The polar angle between 0 and PI
  */
 export function polarAngle(base: Vertex, target: Vertex) {
   const x = target.x - base.x;
   const y = target.y - base.y;
 
-  return Math.abs(Math.atan(y / x));
+  // The target vertex lies under the base vertex
+  if (y < 0) {
+    // The target vertex lies directly under the base vertex
+    if (x === 0) {
+      return Math.PI / 2 + Math.PI;
+    }
+
+    // Third kwadrant
+    if (x < 0) {
+      return Math.PI + Math.atan(-y / -x);
+    }
+
+    // Fourth kwadrant
+    return 2 * Math.PI - Math.atan(-y / x);
+  }
+
+  // The target vertex lies directly above the base vertex
+  if (x === 0) {
+    return Math.PI / 2;
+  }
+
+  // Second kwadrant
+  if (x < 0) {
+    return Math.PI - Math.atan(y / -x);
+  }
+
+  // First kwadrant
+  return Math.atan(y / x);
 }

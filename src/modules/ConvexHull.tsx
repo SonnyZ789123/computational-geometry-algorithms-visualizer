@@ -9,6 +9,7 @@ import {
   andrewConvexHull,
   bruteForceConvexHull,
   grahamConvexHull,
+  jarvisConvexHull,
 } from '../lib/algorithms/convexHull';
 
 import { AlgorithmGenerator, DrawBuffer, Vertex } from '../types';
@@ -32,7 +33,7 @@ const useAlgorithmRouter = () => {
       case GRAHAM:
         return grahamConvexHull;
       case JARVIS:
-        return undefined as unknown as AlgorithmGenerator;
+        return jarvisConvexHull;
       default:
         return undefined as unknown as AlgorithmGenerator; // Dummy return type
     }
