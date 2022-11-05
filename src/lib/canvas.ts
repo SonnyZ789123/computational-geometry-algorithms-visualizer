@@ -119,16 +119,35 @@ export function drawDirectedEdge(
   ctx.stroke();
 }
 
+/**
+ * Used to draw text corresponding to a vertex, will not draw exactly to the
+ * vertex's position.
+ */
 export function drawText(
   ctx: CanvasRenderingContext2D,
   v: Vertex,
   text: string,
   color: string
 ) {
+  const textLength = ctx.measureText(text).width;
+  let xPos = v.x + GRID_SIZE;
+  let yPos = v.y + GRID_SIZE;
+
   ctx.fillStyle = color;
   ctx.font = `${GRID_SIZE * 1.2}px Arial`;
+
+  // Position overflows to the right, so draw to the left
+  if (xPos + textLength > CANVAS_WIDTH) {
+    xPos = v.x - textLength - GRID_SIZE;
+  }
+
+  // Position overflows under, so just draw above the vertex
+  if (yPos + textLength > CANVAS_HEIGHT) {
+    yPos = v.y - GRID_SIZE;
+  }
+
   // Draw the number a grid element to the right and under
-  ctx.fillText(text, v.x + GRID_SIZE, v.y + GRID_SIZE);
+  ctx.fillText(text, xPos, yPos);
 }
 
 export function redrawBuffer(
