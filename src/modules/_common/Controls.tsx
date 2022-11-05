@@ -131,7 +131,9 @@ function Controls({
     // Step through all the steps (yields), when it's done, stop the loop
     playId.current = setInterval(() => {
       if (algorithm.current?.next().done) {
-        resetAlgorithm();
+        clearInterval(playId.current);
+        playId.current = undefined;
+        setPlaying(false);
       }
     }, delayAmount);
   };
