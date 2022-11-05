@@ -6,6 +6,7 @@ import {
   readyCanvas,
   TOTAL_POINTS,
 } from '../../lib/canvas';
+import { darken } from '../../global/styles/helpers';
 
 import { ReactComponent as PlayIcon } from '../../assets/icons/play.svg';
 import { ReactComponent as PauseIcon } from '../../assets/icons/pause.svg';
@@ -69,6 +70,22 @@ const Input = styled.input`
   width: 30%;
 `;
 
+const LogScreen = styled.div`
+  width: 100%;
+  height: 200px;
+  overflow-y: scroll;
+  border: 1px solid ${colors.primary};
+  border-radius: 15px;
+  background-color: ${colors.black};
+`;
+
+const LogList = styled.ul``;
+
+const LogItem = styled.li`
+  font-size: 1rem;
+  color: ${colors.white};
+`;
+
 type ControlsProps = {
   algorithmTitle: string;
   randomize: (amount: number) => void;
@@ -91,6 +108,9 @@ function Controls({
   const [delayAmount, setDelayAmount] = useState(2000); // in ms
   const [amount, setAmount] = useState(5);
 
+  // Step log
+  const [log, setLog] = useState<string[]>([]);
+
   // The reference to the instance of the algorithm Iterator
   const algorithm = useRef<Algorithm>();
   // The interval id that keeps track of the setInterval when the algorithm is playing, it is undefined when not playing.
@@ -108,6 +128,8 @@ function Controls({
       directedEdges: [...drawBuffer.directedEdges],
       text: [...drawBuffer.text],
     };
+
+    setLog([]);
 
     clearAndRedrawBuffer(ctx, localDrawBuffer);
 
@@ -130,10 +152,14 @@ function Controls({
 
     // Step through all the steps (yields), when it's done, stop the loop
     playId.current = setInterval(() => {
-      if (algorithm.current?.next().done) {
+      const step = algorithm.current?.next();
+
+      if (!step || step.done) {
         clearInterval(playId.current);
         playId.current = undefined;
         setPlaying(false);
+      } else {
+        setLog((prev) => [...prev, step.value]);
       }
     }, delayAmount);
   };
@@ -153,8 +179,12 @@ function Controls({
   const handleNextClick = () => {
     if (!algorithm.current) return;
 
-    if (algorithm.current?.next().done) {
+    const step = algorithm.current?.next();
+
+    if (!step || step.done) {
       resetAlgorithm();
+    } else {
+      setLog((prev) => [...prev, step.value]);
     }
   };
 
@@ -224,6 +254,13 @@ function Controls({
       <Button color='secondary' onClick={() => randomize(amount)}>
         Randomize
       </Button>
+      <LogScreen>
+        <LogList>
+          {log.map((step) => (
+            <LogItem>{step}</LogItem>
+          ))}
+        </LogList>
+      </LogScreen>
     </Container>
   );
 }

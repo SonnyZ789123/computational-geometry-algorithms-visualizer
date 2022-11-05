@@ -54,7 +54,7 @@ export function* bruteForceConvexHull(
         value: e1,
         color: CURRENT,
       });
-      yield;
+      yield 'Current edge to evaluate';
 
       for (let k = 0; k < vertices.length; k += 1) {
         if (k === i || k === j) {
@@ -68,13 +68,13 @@ export function* bruteForceConvexHull(
           valid = false;
           drawDirectedEdge(ctx, e2, FAIL);
           // Do not add to drawBuffer
-          yield;
+          yield 'Edge lies on the right: fail';
 
           break;
         } else {
           drawDirectedEdge(ctx, e2, SUCCESS);
           // Do not add to drawBuffer
-          yield;
+          yield 'Edge lies on the left: ok';
         }
         clearAndRedrawBuffer(ctx, localDrawBuffer);
       }
@@ -86,12 +86,17 @@ export function* bruteForceConvexHull(
           value: e1,
           color: CONVEX,
         });
+        // Pop the just processed edge from the drawBuffer so we don't draw it anymore
+        clearAndRedrawBuffer(ctx, localDrawBuffer);
+        yield 'All other edges lie on the left: part of convex hull';
+      } else {
+        // Pop the just processed edge from the drawBuffer so we don't draw it anymore
+        clearAndRedrawBuffer(ctx, localDrawBuffer);
       }
-
-      // Pop the just processed edge from the drawBuffer so we don't draw it anymore
-      clearAndRedrawBuffer(ctx, localDrawBuffer);
     }
   }
+
+  yield 'Done!';
 
   return localDrawBuffer;
 }
@@ -137,7 +142,7 @@ export function* andrewConvexHull(
       color: OTHER,
     });
   });
-  yield;
+  yield 'Sort vertices based on x-value';
 
   // UPPER HULL
   const upper = [sortedVertices[0], sortedVertices[1]];
@@ -150,7 +155,7 @@ export function* andrewConvexHull(
     value: { from: sortedVertices[0], to: sortedVertices[1] },
     color: CONVEX,
   });
-  yield;
+  yield `Upper Hull: 0 -> ${n - 1}`;
 
   for (let i = 2; i < n; i += 1) {
     upper.push(sortedVertices[i]);
@@ -165,7 +170,7 @@ export function* andrewConvexHull(
       value: { from: v2, to: v3 },
       color: OTHER,
     });
-    yield;
+    yield 'Current edge to evaluate';
 
     // While the next edge makes a left turn, delete the second last vertex.
     // So the upper contains only vertices that continually make right turns.
@@ -176,7 +181,7 @@ export function* andrewConvexHull(
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       upper.splice(upperLength - 2, 1); // Delete the middle vertex
       upperLength -= 1;
-      yield;
+      yield 'Makes left turn, delete previous edge';
 
       // Pop that edge that was faulty part of the convex hull
       localDrawBuffer.directedEdges.pop();
@@ -193,9 +198,11 @@ export function* andrewConvexHull(
       value: { from: v2, to: v3 },
       color: CONVEX,
     });
+
     clearAndRedrawBuffer(ctx, localDrawBuffer);
-    yield;
+    yield 'No left turns';
   }
+  yield 'Upper Hull finished';
 
   // LOWER HULL
   // The same but now we start from highest x-values
@@ -209,7 +216,7 @@ export function* andrewConvexHull(
     value: { from: sortedVertices[n - 1], to: sortedVertices[n - 2] },
     color: CONVEX,
   });
-  yield;
+  yield `Upper Hull: ${n - 1} -> 0`;
 
   for (let i = n - 3; i >= 0; i -= 1) {
     lower.push(sortedVertices[i]);
@@ -224,7 +231,7 @@ export function* andrewConvexHull(
       value: { from: v2, to: v3 },
       color: OTHER,
     });
-    yield;
+    yield 'Current edge to evaluate';
 
     while (
       lowerLength > 2 &&
@@ -233,7 +240,7 @@ export function* andrewConvexHull(
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       lower.splice(lowerLength - 2, 1);
       lowerLength -= 1;
-      yield;
+      yield 'Makes left turn, delete previous edge';
 
       localDrawBuffer.directedEdges.pop();
 
@@ -247,12 +254,16 @@ export function* andrewConvexHull(
       value: { from: v2, to: v3 },
       color: CONVEX,
     });
+
     clearAndRedrawBuffer(ctx, localDrawBuffer);
-    yield;
+    yield 'No left turns';
   }
+  yield 'Lower Hull finished';
 
   // At the end we actually need to concat upper and lower (lower without first
   // and last vertex)
+
+  yield 'Done!';
 
   return localDrawBuffer;
 }
@@ -292,6 +303,12 @@ export function* grahamConvexHull(
       next.y < prev.value.y ? { value: next, index } : prev,
     { value: vertices[0], index: 0 }
   );
+  drawText(ctx, v0, 'Base', OTHER);
+  localDrawBuffer.text.push({
+    value: { position: v0, text: 'Base' },
+    color: OTHER,
+  });
+  yield 'Find vertex with lowest y-value';
 
   const sortedVertices = [...vertices]; // copy the vertices
   sortedVertices.splice(minYIndex, 1); // Remove the base vertex with the lowes y-coordinate
@@ -308,7 +325,7 @@ export function* grahamConvexHull(
       color: OTHER,
     });
   });
-  yield;
+  yield 'Sort based on polar angle';
 
   const convexHull = [v0, sortedVertices[0]];
   drawDirectedEdge(ctx, { from: v0, to: sortedVertices[0] }, CONVEX);
@@ -316,7 +333,7 @@ export function* grahamConvexHull(
     value: { from: v0, to: sortedVertices[0] },
     color: CONVEX,
   });
-  yield;
+  yield 'Initialise loop';
   for (let i = 1; i < n; i += 1) {
     convexHull.push(sortedVertices[i]);
 
@@ -330,7 +347,7 @@ export function* grahamConvexHull(
       value: { from: v2, to: v3 },
       color: OTHER,
     });
-    yield;
+    yield 'Currently edge to evaluate';
 
     // While the next edge makes a left turn, delete the second last vertex.
     // So the upper contains only vertices that continually make right turns.
@@ -341,7 +358,7 @@ export function* grahamConvexHull(
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       convexHull.splice(upperLength - 2, 1); // Delete the middle vertex
       upperLength -= 1;
-      yield;
+      yield 'Makes left turn, delete previous edge';
 
       // Pop that edge that was faulty part of the convex hull
       localDrawBuffer.directedEdges.pop();
@@ -358,7 +375,9 @@ export function* grahamConvexHull(
       value: { from: v2, to: v3 },
       color: CONVEX,
     });
+
     clearAndRedrawBuffer(ctx, localDrawBuffer);
+    yield 'No left turns';
   }
 
   // Draw a last edge to connect the last one with the base vertex
@@ -371,7 +390,7 @@ export function* grahamConvexHull(
     value: { from: convexHull[convexHull.length - 1], to: v0 },
     color: CONVEX,
   });
-  yield;
+  yield 'Done!';
 
   return localDrawBuffer;
 }
@@ -411,6 +430,8 @@ export function* jarvisConvexHull(
       next.y < prev.value.y ? { value: next, index } : prev,
     { value: vertices[0], index: 0 }
   );
+  drawText(ctx, v0, 'Start', OTHER);
+  yield 'Find vertex with lowest y-value';
 
   // Find the vertex with the highst y coordinate
   const maxY = vertices.reduce(
@@ -440,22 +461,25 @@ export function* jarvisConvexHull(
     sortPolarAngle(base, rest);
     rest.forEach((v, index) => drawText(ctx, v, index.toString(), OTHER));
     drawText(ctx, rest[0], '0', CONVEX);
-    yield;
+    yield 'Sort based on polar angle';
 
     drawDirectedEdge(ctx, { from: base, to: rest[0] }, CONVEX);
     localDrawBuffer.directedEdges.push({
       value: { from: base, to: rest[0] },
       color: CONVEX,
     });
-    yield;
+    yield 'Connect edge from base to lowest polar angle';
 
     const temp = base;
     [base] = rest;
     rest = [...rest.slice(1), temp];
 
     clearAndRedrawBuffer(ctx, localDrawBuffer);
+    drawText(ctx, base, 'Base', OTHER);
+    yield 'Define new base';
 
     if (base === maxY) {
+      yield 'Reached highest y-value, rotate polar angle calculations 180 deg';
       break;
     }
   }
@@ -466,25 +490,29 @@ export function* jarvisConvexHull(
     sortPolarAngle({ x: -base.x, y: -base.y }, rest, -1);
     rest.forEach((v, index) => drawText(ctx, v, index.toString(), OTHER));
     drawText(ctx, rest[0], '0', CONVEX);
-    yield;
+    yield 'Sort based on polar angle';
 
     drawDirectedEdge(ctx, { from: base, to: rest[0] }, CONVEX);
     localDrawBuffer.directedEdges.push({
       value: { from: base, to: rest[0] },
       color: CONVEX,
     });
-    yield;
+    yield 'Connect edge from base to lowest polar angle';
 
     const temp = base;
     [base] = rest;
     rest = [...rest.slice(1), temp];
 
     clearAndRedrawBuffer(ctx, localDrawBuffer);
+    drawText(ctx, base, 'Base', OTHER);
+    yield 'Define new base';
 
     if (base === v0) {
       break;
     }
   }
+
+  yield 'Done!';
 
   return localDrawBuffer;
 }

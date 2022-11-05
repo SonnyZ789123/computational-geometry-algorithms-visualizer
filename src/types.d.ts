@@ -33,7 +33,7 @@ export type AlgorithmData = {
   directedEdges?: readonly DirectedEdge[];
 };
 
-export type Algorithm = Generator<undefined, DrawBuffer | undefined, unknown>;
+export type Algorithm = Generator<string, DrawBuffer, unknown>;
 
 export type AlgorithmGenerator = (
   ctx: CanvasRenderingContext2D,
