@@ -25,7 +25,7 @@ export function drawGrid(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.lineWidth = 1;
 
-    ctx.strokeStyle = colors.darkGrey;
+    ctx.strokeStyle = colors.greyDark;
 
     ctx.moveTo(0, GRID_SIZE * i + 0.5);
     ctx.lineTo(CANVAS_WIDTH, GRID_SIZE * i + 0.5);
@@ -38,7 +38,7 @@ export function drawGrid(ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.lineWidth = 1;
 
-    ctx.strokeStyle = colors.darkGrey;
+    ctx.strokeStyle = colors.greyDark;
 
     ctx.moveTo(GRID_SIZE * i + 0.5, 0);
     ctx.lineTo(GRID_SIZE * i + 0.5, CANVAS_HEIGHT);

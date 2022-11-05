@@ -6,10 +6,11 @@ import colors from '../../global/styles/colors';
 
 // Define some uniform colors
 const CURRENT = colors.white;
-const OTHER = colors.lightGrey;
-const SUCCESS = colors.lightGreen;
-const FAIL = colors.red;
+const OTHER = colors.secondary;
+const SUCCESS = colors.success;
+const FAIL = colors.danger;
 const CONVEX = colors.yellow;
+const TEXT = colors.greyLight;
 
 /**
  * Draw the convex hull of a list of vertices in a brute force manner.
@@ -136,10 +137,10 @@ export function* andrewConvexHull(
   // Sort based on x value
   sortedVertices.sort((v1, v2) => (v1.x < v2.x ? -1 : 1));
   sortedVertices.forEach((v, i) => {
-    drawText(ctx, v, i.toString(), OTHER);
+    drawText(ctx, v, i.toString(), TEXT);
     localDrawBuffer.text.push({
       value: { position: v, text: i.toString() },
-      color: OTHER,
+      color: TEXT,
     });
   });
   yield 'Sort vertices based on x-value';
@@ -303,10 +304,10 @@ export function* grahamConvexHull(
       next.y < prev.value.y ? { value: next, index } : prev,
     { value: vertices[0], index: 0 }
   );
-  drawText(ctx, v0, 'Base', OTHER);
+  drawText(ctx, v0, 'Base', TEXT);
   localDrawBuffer.text.push({
     value: { position: v0, text: 'Base' },
-    color: OTHER,
+    color: TEXT,
   });
   yield 'Find vertex with lowest y-value';
 
@@ -319,10 +320,10 @@ export function* grahamConvexHull(
     polarAngle(v0, v1) < polarAngle(v0, v2) ? -1 : 1
   );
   sortedVertices.forEach((v, i) => {
-    drawText(ctx, v, i.toString(), OTHER);
+    drawText(ctx, v, i.toString(), TEXT);
     localDrawBuffer.text.push({
       value: { position: v, text: i.toString() },
-      color: OTHER,
+      color: TEXT,
     });
   });
   yield 'Sort based on polar angle';
@@ -430,7 +431,7 @@ export function* jarvisConvexHull(
       next.y < prev.value.y ? { value: next, index } : prev,
     { value: vertices[0], index: 0 }
   );
-  drawText(ctx, v0, 'Start', OTHER);
+  drawText(ctx, v0, 'Start', TEXT);
   yield 'Find vertex with lowest y-value';
 
   // Find the vertex with the highst y coordinate
@@ -459,7 +460,7 @@ export function* jarvisConvexHull(
   // Goes till it reaches the highest vertex
   for (let i = 0; i < n; i += 1) {
     sortPolarAngle(base, rest);
-    rest.forEach((v, index) => drawText(ctx, v, index.toString(), OTHER));
+    rest.forEach((v, index) => drawText(ctx, v, index.toString(), TEXT));
     drawText(ctx, rest[0], '0', CONVEX);
     yield 'Sort based on polar angle';
 
@@ -475,7 +476,7 @@ export function* jarvisConvexHull(
     rest = [...rest.slice(1), temp];
 
     clearAndRedrawBuffer(ctx, localDrawBuffer);
-    drawText(ctx, base, 'Base', OTHER);
+    drawText(ctx, base, 'Base', TEXT);
     yield 'Define new base';
 
     if (base === maxY) {
@@ -488,7 +489,7 @@ export function* jarvisConvexHull(
     // We need to multiply the x and y of target - base vertex with -1
     // -result = target - base => result = -target - -base
     sortPolarAngle({ x: -base.x, y: -base.y }, rest, -1);
-    rest.forEach((v, index) => drawText(ctx, v, index.toString(), OTHER));
+    rest.forEach((v, index) => drawText(ctx, v, index.toString(), TEXT));
     drawText(ctx, rest[0], '0', CONVEX);
     yield 'Sort based on polar angle';
 
@@ -504,7 +505,7 @@ export function* jarvisConvexHull(
     rest = [...rest.slice(1), temp];
 
     clearAndRedrawBuffer(ctx, localDrawBuffer);
-    drawText(ctx, base, 'Base', OTHER);
+    drawText(ctx, base, 'Base', TEXT);
     yield 'Define new base';
 
     if (base === v0) {

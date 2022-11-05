@@ -23,7 +23,7 @@ const DropdownMenu = styled.div`
   padding: 1rem 5rem;
   z-index: 3;
   border-radius: 15px;
-  background-color: ${colors.primary};
+  background-color: ${colors.primaryDark};
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
@@ -45,7 +45,7 @@ const Dropdown = styled.div`
   &:hover {
     & span {
       cursor: pointer;
-      text-decoration: underline ${colors.secondary};
+      text-decoration: underline ${colors.primaryLight};
       text-underline-offset: 0.5rem;
     }
 
@@ -61,7 +61,7 @@ const StyledLink = styled(Link)`
   transition: color 150ms ease-in-out;
 
   &:hover {
-    color: ${colors.secondary};
+    color: ${colors.greyLight};
   }
 `;
 

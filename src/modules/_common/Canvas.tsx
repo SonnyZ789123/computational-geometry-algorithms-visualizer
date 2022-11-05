@@ -5,7 +5,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, drawGrid } from '../../lib/canvas';
 
 const CanvasWrapper = styled.div`
   grid-column: 1 / 9;
-  border: 5px solid ${colors.primary};
+  border: 5px solid ${colors.secondary};
   border-radius: 20px;
   overflow: hidden;
 

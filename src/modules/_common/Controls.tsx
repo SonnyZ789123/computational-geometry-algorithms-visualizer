@@ -6,6 +6,7 @@ import {
   readyCanvas,
   TOTAL_POINTS,
 } from '../../lib/canvas';
+import { darken } from '../../global/styles/helpers';
 
 import { ReactComponent as PlayIcon } from '../../assets/icons/play.svg';
 import { ReactComponent as PauseIcon } from '../../assets/icons/pause.svg';
@@ -31,9 +32,9 @@ const Container = styled.div`
 const AlgorithmTitle = styled.h1`
   margin: 0;
   text-decoration: underline;
-  text-decoration-color: ${colors.primary};
+  text-decoration-color: ${colors.primaryLight};
   text-underline-offset: 0.5rem;
-  color: ${colors.light};
+  color: ${colors.white};
   font-size: 1.5rem;
   text-align: center;
 `;
@@ -50,7 +51,12 @@ const Icon = styled.button<{ disabled?: boolean }>`
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
   background: none;
   border: none;
-  stroke: ${({ disabled }) => (disabled ? colors.darkGreen : colors.secondary)};
+  stroke: ${({ disabled }) =>
+    disabled ? colors.actionDark : colors.actionLight};
+
+  &:hover {
+    ${({ disabled }) => (disabled ? undefined : darken(0.3))}
+  }
 `;
 
 const ControlContainer = styled.div`
@@ -64,9 +70,16 @@ const Description = styled.label`
 `;
 
 const Input = styled.input`
+  text-decoration: none;
   font-size: 1.25rem;
-  color: ${colors.secondary};
+  color: ${colors.white};
   width: 30%;
+  background-color: ${colors.greyDark};
+  border-radius: 5px;
+
+  &:focus {
+    outline: 2px solid ${colors.actionDark};
+  }
 `;
 
 const LogScreen = styled.div`
@@ -74,7 +87,7 @@ const LogScreen = styled.div`
   width: 100%;
   height: 200px;
   overflow-y: scroll;
-  border: 1px solid ${colors.primary};
+  border: 2px solid ${colors.primaryDark};
   border-radius: 5px;
   background-color: ${colors.black};
 
@@ -83,7 +96,7 @@ const LogScreen = styled.div`
   }
 
   ::-webkit-scrollbar-thumb {
-    background: ${colors.primary};
+    background: ${colors.primaryDark};
     border-radius: 10px;
   }
 `;
@@ -99,7 +112,7 @@ const LogItem = styled.li`
   color: ${colors.white};
 
   span {
-    color: ${colors.secondary};
+    color: ${colors.greenLight};
   }
 `;
 
@@ -268,9 +281,7 @@ function Controls({
           max={TOTAL_POINTS / 5} // Accept less than a fifth of the total possible amount of points
         />
       </ControlContainer>
-      <Button color='secondary' onClick={() => randomize(amount)}>
-        Randomize
-      </Button>
+      <Button onClick={() => randomize(amount)}>Randomize</Button>
       <LogScreen>
         <LogList>
           {log.map((step, i) => (
