@@ -5,7 +5,7 @@ import { DirectedLine, Line, Vertex } from '../../types';
  *
  * @param {Vertex} v1 - The first vertex
  * @param {Vertex} v2 - The second vertex
- * @returns The crossproduct v1 X v2
+ * @returns {number} - The crossproduct v1 X v2
  */
 export function crossProduct(v1: Vertex, v2: Vertex): number {
   return v1.x * v2.y - v2.x * v1.y;
@@ -16,7 +16,7 @@ export function crossProduct(v1: Vertex, v2: Vertex): number {
  *
  * @param {DirectedLine} baseLine - The base line for the orientation
  * @param {DirectedLine} targetLine - The target line that get's compared to the base line
- * @returns 0 if they extend eachother, > 0 if the target line makes a clockwise turn, < 0 if the target line makes a counter clockwise turn.
+ * @returns {number} - 0 if they extend eachother, > 0 if the target line makes a clockwise turn, < 0 if the target line makes a counter clockwise turn.
  */
 export function relativeOrientation(
   baseLine: DirectedLine,
@@ -43,7 +43,7 @@ export function relativeOrientation(
  *
  * @param {DirectedLine} baseLine - The base line for the orientation
  * @param {DirectedLine} nextLine - The next line that get's compared to the base line
- * @returns 0 if they extend eachother, > 0 if the next line makes a clockwise turn, < 0 if the next line makes a counter clockwise turn.
+ * @returns {number} - 0 if they extend eachother, > 0 if the next line makes a clockwise turn, < 0 if the next line makes a counter clockwise turn.
  */
 export function turnOrientation(
   baseLine: DirectedLine,
@@ -66,7 +66,7 @@ export function turnOrientation(
  *
  * @param {Line} line1 - The first line
  * @param {Line} line2 - The second line
- * @returns True if the 2 lines intersect, otherwise false
+ * @returns {boolean} - True if the 2 lines intersect, otherwise false
  */
 export function intersectLines(line1: Line, line2: Line): boolean {
   const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = line1;

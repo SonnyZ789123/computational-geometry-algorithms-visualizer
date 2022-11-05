@@ -18,7 +18,7 @@ const TEXT = colors.greyLight;
  * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
  * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
  * @param {{ vertices: readonly Vertex[] }} data - The data object that contains the elements for processing
- * @returns {DrawBuffer} The local drawBuffer
+ * @returns {DrawBuffer} - The local drawBuffer
  */
 export function* bruteForceConvexHull(
   ctx: CanvasRenderingContext2D,
@@ -108,7 +108,7 @@ export function* bruteForceConvexHull(
  * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
  * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
  * @param {{ vertices: readonly Vertex[] }} data - The data object that contains the elements for processing
- * @returns {DrawBuffer} The local drawBuffer
+ * @returns {DrawBuffer} - The local drawBuffer
  */
 export function* andrewConvexHull(
   ctx: CanvasRenderingContext2D,
@@ -275,7 +275,7 @@ export function* andrewConvexHull(
  * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
  * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
  * @param {{ vertices: readonly Vertex[] }} data - The data object that contains the elements for processing
- * @returns {DrawBuffer} The local drawBuffer
+ * @returns {DrawBuffer} - The local drawBuffer
  */
 export function* grahamConvexHull(
   ctx: CanvasRenderingContext2D,
@@ -402,7 +402,7 @@ export function* grahamConvexHull(
  * @param {CanvasRenderingContext2D} ctx - The canvas context that will be drawn on
  * @param {DrawVuffer} drawBuffer - The drawBuffer that contains already drawn elements
  * @param {{ vertices: readonly Vertex[] }} data - The data object that contains the elements for processing
- * @returns {DrawBuffer} The local drawBuffer
+ * @returns {DrawBuffer} - The local drawBuffer
  */
 export function* jarvisConvexHull(
   ctx: CanvasRenderingContext2D,

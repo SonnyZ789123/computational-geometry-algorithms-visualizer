@@ -242,6 +242,6 @@ export function generateRandomEdges(amount: number) {
  * Generate a simple polygon, thus with no intersecting edges.
  *
  * @param {number} _amount - The amount of edges the polygon consists of
- * @returns {DirectedEdge[]} The edges of the simple polygon in clockwise order
+ * @returns {DirectedEdge[]} - The edges of the simple polygon in clockwise order
  */
 export function generateSimplePolygon(amount: number) {}
