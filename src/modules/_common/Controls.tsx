@@ -6,7 +6,6 @@ import {
   readyCanvas,
   TOTAL_POINTS,
 } from '../../lib/canvas';
-import { darken } from '../../global/styles/helpers';
 
 import { ReactComponent as PlayIcon } from '../../assets/icons/play.svg';
 import { ReactComponent as PauseIcon } from '../../assets/icons/pause.svg';
@@ -71,19 +70,37 @@ const Input = styled.input`
 `;
 
 const LogScreen = styled.div`
+  padding: 0 15px;
   width: 100%;
   height: 200px;
   overflow-y: scroll;
   border: 1px solid ${colors.primary};
-  border-radius: 15px;
+  border-radius: 5px;
   background-color: ${colors.black};
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: ${colors.primary};
+    border-radius: 10px;
+  }
 `;
 
-const LogList = styled.ul``;
+const LogList = styled.ul`
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+`;
 
 const LogItem = styled.li`
   font-size: 1rem;
   color: ${colors.white};
+
+  span {
+    color: ${colors.secondary};
+  }
 `;
 
 type ControlsProps = {
@@ -159,7 +176,7 @@ function Controls({
         playId.current = undefined;
         setPlaying(false);
       } else {
-        setLog((prev) => [...prev, step.value]);
+        setLog((prev) => [step.value, ...prev]);
       }
     }, delayAmount);
   };
@@ -184,7 +201,7 @@ function Controls({
     if (!step || step.done) {
       resetAlgorithm();
     } else {
-      setLog((prev) => [...prev, step.value]);
+      setLog((prev) => [step.value, ...prev]);
     }
   };
 
@@ -257,7 +274,10 @@ function Controls({
       <LogScreen>
         <LogList>
           {log.map((step) => (
-            <LogItem>{step}</LogItem>
+            <LogItem>
+              <span>&gt; </span>
+              {step}
+            </LogItem>
           ))}
         </LogList>
       </LogScreen>
