@@ -273,8 +273,12 @@ function Controls({
       </Button>
       <LogScreen>
         <LogList>
-          {log.map((step) => (
-            <LogItem>
+          {log.map((step, i) => (
+            // The step logs are added at the front so the element ids (here indeces) always shift
+            // to the right. So the first element with id = 1 (and initially index 0) is at the end
+            // of the list.
+            // eslint-disable-next-line react/no-array-index-key
+            <LogItem key={log.length - i}>
               <span>&gt; </span>
               {step}
             </LogItem>
