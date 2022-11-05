@@ -75,7 +75,7 @@ We use Prettier formatter and ESLint as linter, so you need to install these in 
 
 ## Git Workflow
 
-### contributing Guide
+### Contributing Guide
 
 [Step-by-step guide to contributing on GitHub](https://www.dataschool.io/how-to-contribute-on-github/)
 
@@ -83,7 +83,15 @@ We use Prettier formatter and ESLint as linter, so you need to install these in 
 
 A branch represents an issue. With the issue comes some additional information and guidelines.
 
-When you decide to contribute to an issue, you make a new branch with the name "feature/<#ticketnr>-\<abvoftitle\>". So image there is an issue with the title "Convex Hull - Andrew's Algorithm implementation #1", this case the ticketnr is #1 so the branch name will be "feature/#1-convex-hull-andrew". You also assign yourself to the issue so others know you're already working on it.
+When you decide to contribute to an issue, you make a new branch with the name "\<type\>/<#ticketnr>-\<abvoftitle\>". So image there is an issue with the title "Convex Hull - Andrew's Algorithm implementation #1", this case the ticketnr is #1 so the branch name will be "feature/#1-convex-hull-andrew". You also assign yourself to the issue so others know you're already working on it.
+
+### [Draft Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request)
+
+When creating a new branch, you can make a small change and immediatly request a pull request (PR). Then you mark this PR as a draft, this way people know you're still working on it. At the development section in the sidebar of the PR, you can link that PR to a specific issue.
+
+### Linking commits to an issue
+
+You can link your commits to an issue, simply by including the issue number (#\<nr>) in your commit message. I strongly encourige you to use an git GUI like [Github Desktop](https://desktop.github.com/).
 
 # Algorithms
 
@@ -108,6 +116,7 @@ type DrawBuffer = {
   vertices: { value: Vertex; color: string }[];
   edges: { value: Edge; color: string }[];
   directedEdges: { value: Directed; color: string }[];
+  text: { value: { position: Vertex; text: string }; color: string }[];
 };
 
 type AlgorithmGenerator = (
@@ -116,7 +125,7 @@ type AlgorithmGenerator = (
   data: AlgorithmData // Data you use
 ) => Algorithm;
 
-type Algorithm = Generator<undefined, DrawBuffer | undefined, unknown>;
+type Algorithm = Generator<string, DrawBuffer, unknown>;
 ```
 
 The function returns a `Generator` that returns a `DrawBuffer`. The parameters:
@@ -155,7 +164,7 @@ export function* bruteForceConvexHull(
 }
 ```
 
-For every "step" you want to define, put a `yield` where you want it to stop. In this example we "step" over every edge (from a list of vertices), draw the edge as a directed edge (arrow) and add it to the drawn edges in the local draw buffer.
+For every "step" you want to define, put a `yield` where you want it to stop and give some further explanation. In this example we "step" over every edge (from a list of vertices), draw the edge as a directed edge (arrow) and add it to the drawn edges in the local draw buffer.
 
 ```typescript
 for (let i = 0; i < vertices.length; i += 1) {
@@ -170,7 +179,7 @@ for (let i = 0; i < vertices.length; i += 1) {
       value: e1,
       color: colors.white,
     });
-    yield; // Stop here
+    yield 'Current edge to evaluate'; // Stop here
   }
 }
 ```

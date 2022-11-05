@@ -7,7 +7,7 @@ import { darken } from '../styles/helpers';
 const StyledButton = styled.button`
   color: ${colors.white};
   border: none;
-  border-radius: 15px;
+  border-radius: 10px;
   background-color: ${colors.actionDark};
   font-size: 1.25rem;
   padding: 10px 25px;
