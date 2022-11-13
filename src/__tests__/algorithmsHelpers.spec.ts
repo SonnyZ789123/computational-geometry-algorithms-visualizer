@@ -5,6 +5,8 @@ import {
   turnOrientation,
 } from '../lib/algorithms/_helpers';
 
+import { Line } from '../types';
+
 describe('Algorithms helpers tests', () => {
   const v0 = {
     x: -1,
@@ -67,12 +69,53 @@ describe('Algorithms helpers tests', () => {
   });
 
   describe('Intersect Lines', () => {
+    const coincident1: Line = [
+      {
+        x: -1,
+        y: 1,
+      },
+      {
+        x: 1,
+        y: -1,
+      },
+    ];
+
+    const coincident2: Line = [
+      {
+        x: -3,
+        y: 3,
+      },
+      {
+        x: 3,
+        y: -3,
+      },
+    ];
+
+    const lengthZero: Line = [
+      {
+        x: 0,
+        y: 0,
+      },
+      {
+        x: 0,
+        y: 1,
+      },
+    ];
+
     it('should return true when they intersect', () => {
       expect(intersectLines([v0, v1], [v2, v4])).toBe(true);
     });
 
     it('should return false when they do not intersect', () => {
       expect(intersectLines([v0, v4], [v2, v1])).toBe(false);
+    });
+
+    it('should return true when they are coincident', () => {
+      expect(intersectLines(coincident1, coincident2)).toBe(true);
+    });
+
+    it('should return false when one is of length 0', () => {
+      expect(intersectLines(lengthZero, [v2, v1])).toBe(false);
     });
   });
 });
