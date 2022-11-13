@@ -2,11 +2,12 @@ import React, { useRef, useState, useMemo, useCallback } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import {
   clearAndRedrawBuffer,
-  generateRandomVertices,
+  generateRandomEdges,
   readyCanvas,
 } from '../lib/canvas';
+import { lineSegmentIntersectionBruteForce } from '../lib/algorithms/lineSegmentIntersection';
 
-import { AlgorithmGenerator, DrawBuffer, Vertex } from '../types';
+import { AlgorithmGenerator, DrawBuffer, Edge } from '../types';
 import colors from '../global/styles/colors';
 import { lineSegmentIntersection as lineSegmentIntersectionIds } from '../global/routes/paths';
 
@@ -25,8 +26,8 @@ const useAlgorithmRouter = () => {
     switch (id) {
       case BRUTE_FORCE:
         return {
-          title: 'Brute Force Line Sgement Intersection',
-          algorithm: undefined as unknown as AlgorithmGenerator,
+          title: 'Brute Force Line Segment Intersection',
+          algorithm: lineSegmentIntersectionBruteForce,
         };
       case PLANE_SWEEP:
         return {
@@ -61,23 +62,23 @@ function LineSegmentIntersection(): JSX.Element {
   const algorithmRouter = useAlgorithmRouter();
   /// ///
 
-  const [vertices, setVertices] = useState<Vertex[]>([]); // Edges
+  const [edges, setEdges] = useState<Edge[]>([]); // Edges
 
   const randomize = useCallback((amount: number) => {
     const ctx = readyCanvas(canvasRef.current);
     if (!ctx) return;
 
-    const localVertices = generateRandomVertices(amount);
+    const localEdges = generateRandomEdges(amount);
     const localDrawBuffer = {
-      vertices: [
-        ...localVertices.map((v) => ({ value: v, color: colors.secondary })),
+      vertices: [],
+      edges: [
+        ...localEdges.map((v) => ({ value: v, color: colors.secondary })),
       ],
-      edges: [],
       directedEdges: [],
       text: [],
     };
     clearAndRedrawBuffer(ctx, localDrawBuffer);
-    setVertices(localVertices);
+    setEdges(localEdges);
     setDrawBuffer(localDrawBuffer);
   }, []);
 
@@ -92,7 +93,7 @@ function LineSegmentIntersection(): JSX.Element {
         genAlgorithm={algorithmRouter.algorithm}
         canvasElement={canvasRef.current}
         drawBuffer={drawBuffer}
-        data={{ vertices }}
+        data={{ edges }}
       />
     </PageWrapper>
   );
