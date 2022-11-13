@@ -1,4 +1,4 @@
-import { DirectedLine, Line, Vertex } from '../../types';
+import { DirectedLine, Line, Vertex, Edge } from '../../types';
 
 /**
  * Calculates the cross product.
@@ -74,7 +74,9 @@ export function turnOrientation(
 }
 
 /**
- * Determines if 2 given line segments intersect, but does not calculate the point.
+ * @deprecated Needs to be updated to look like intersectEdgesPoint but for lines.
+ *
+ * Determines if 2 given lines intersect, but does not calculate the point.
  *
  * @param {Line} line1 - The first line
  * @param {Line} line2 - The second line
@@ -111,24 +113,40 @@ export function intersectLines(line1: Line, line2: Line): boolean {
 }
 
 /**
- * Calculate the intersect point of 2 intersecting lines segments.
+ * Calculate the intersect point of 2 intersecting lines segments (edge).
  * Precondition: the lines intersect -> first check with intersectLines.
  * line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/.
  *
- * @param {Line} line1 - The first line
- * @param {Line} line2 - The second line
- * @param {Vertex} - The intersecting point
+ * @param {Line} edge1 - The first line
+ * @param {Line} edge2 - The second line
+ * @returns {{ intersect: boolean; p: Vertex }} - An object with intersect key indicating if they intersect or not and p the point
  */
-export function intersectLinesPoint(line1: Line, line2: Line): Vertex {
-  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = line1;
-  const [{ x: x3, y: y3 }, { x: x4, y: y4 }] = line2;
+export function intersectEdgesPoint(
+  edge1: Edge,
+  edge2: Edge
+): { intersect: boolean; p: Vertex } {
+  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = edge1;
+  const [{ x: x3, y: y3 }, { x: x4, y: y4 }] = edge2;
+  const p: Vertex = {
+    x: 0,
+    y: 0,
+  };
+
+  // can the lines even intersect?
+  if (
+    Math.max(x1, x2) < Math.min(x3, x4) ||
+    Math.max(x3, x4) < Math.min(x1, x2) ||
+    Math.max(y1, y2) < Math.min(y3, y4) ||
+    Math.max(y3, y4) < Math.min(y1, y2)
+  ) {
+    return { intersect: false, p };
+  }
 
   // see http://paulbourke.net/geometry/pointlineplane/
   const denominator = crossProduct(
     { x: x2 - x1, y: y2 - y1 },
     { x: x4 - x3, y: y4 - y3 }
   );
-  // Actually same calculations as above, denumerator just normalizes it
   const numerator1 = crossProduct(
     { x: x4 - x3, y: y4 - y3 },
     { x: x1 - x3, y: y1 - y3 }
@@ -138,23 +156,29 @@ export function intersectLinesPoint(line1: Line, line2: Line): Vertex {
     { x: x1 - x3, y: y1 - y3 }
   );
 
-  // The lines are coincident -> just return the middle of a line segment
-  if (numerator1 === 0 && numerator2 === 0 && denominator === 0) {
-    return {
-      x: x2 > x1 ? (x2 - x1) / 2 + x1 : (x1 - x2) / 2 + x2,
-      y: y2 > y1 ? (y2 - y1) / 2 + y1 : (y1 - y2) / 2 + y2,
-    };
+  const ua = numerator1 / denominator;
+  const ub = numerator2 / denominator;
+
+  // They don't intersect, edges are not long enough
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+    return { intersect: false, p };
   }
 
-  const ua = numerator1 / denominator;
-  // Calculating one slope is enough
-  // const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+  // The lines are coincident -> just return the middle of a line segment
+  if (numerator1 === 0 && numerator2 === 0 && denominator === 0) {
+    p.x = x2 > x1 ? (x2 - x1) / 2 + x1 : (x1 - x2) / 2 + x2;
+    p.y = y2 > y1 ? (y2 - y1) / 2 + y1 : (y1 - y2) / 2 + y2;
 
-  // Return a object with the x and y coordinates of the intersection
-  const x = x1 + ua * (x2 - x1);
-  const y = y1 + ua * (y2 - y1);
+    return { intersect: true, p };
+  }
 
-  return { x, y };
+  p.x = x1 + ua * (x2 - x1);
+  p.y = y1 + ua * (y2 - y1);
+
+  return {
+    intersect: true,
+    p,
+  };
 }
 
 /**
