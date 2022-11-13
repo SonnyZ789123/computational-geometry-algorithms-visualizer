@@ -3,6 +3,7 @@ import {
   intersectLines,
   relativeOrientation,
   turnOrientation,
+  intersectLinesPoint,
 } from '../lib/algorithms/_helpers';
 
 import { Line } from '../types';
@@ -116,6 +117,63 @@ describe('Algorithms helpers tests', () => {
 
     it('should return false when one is of length 0', () => {
       expect(intersectLines(lengthZero, [v2, v1])).toBe(false);
+    });
+  });
+
+  describe('Intersect Lines Point', () => {
+    const line1: Line = [
+      {
+        x: -3,
+        y: 1,
+      },
+      {
+        x: 3,
+        y: -1,
+      },
+    ];
+
+    const line2: Line = [
+      {
+        x: 0,
+        y: 3,
+      },
+      {
+        x: 0,
+        y: -3,
+      },
+    ];
+
+    const coincident1: Line = [
+      {
+        x: -1,
+        y: 1,
+      },
+      {
+        x: 1,
+        y: -1,
+      },
+    ];
+
+    const coincident2: Line = [
+      {
+        x: -3,
+        y: 3,
+      },
+      {
+        x: 3,
+        y: -3,
+      },
+    ];
+
+    it('should return the intersect point', () => {
+      expect(intersectLinesPoint(line1, line2)).toEqual({ x: 0, y: 0 });
+    });
+
+    it('should return the middle they are coincident', () => {
+      expect(intersectLinesPoint(coincident1, coincident2)).toEqual({
+        x: 0,
+        y: 0,
+      });
     });
   });
 });

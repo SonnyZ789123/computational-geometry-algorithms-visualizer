@@ -12,6 +12,18 @@ export function crossProduct(v1: Vertex, v2: Vertex): number {
 }
 
 /**
+ * Calculates the length of a line segment.
+ *
+ * @param {Line} l - The line
+ * @returns {number} - The length of the line
+ */
+export function lengthLine(l: Line): number {
+  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = l;
+
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
+/**
  * Calculates the turn a target line makes, relative to the base line.
  *
  * @param {DirectedLine} baseLine - The base line for the orientation
@@ -62,7 +74,7 @@ export function turnOrientation(
 }
 
 /**
- * Determines if 2 given line segments intersect.
+ * Determines if 2 given line segments intersect, but does not calculate the point.
  *
  * @param {Line} line1 - The first line
  * @param {Line} line2 - The second line
@@ -91,10 +103,58 @@ export function intersectLines(line1: Line, line2: Line): boolean {
     { x: x2 - x1, y: y2 - y1 }
   );
 
+  // If the 2 lines are coincident, both orientations will be 0
   return (
     (orientation1 >= 0 && orientation2 <= 0) ||
     (orientation1 <= 0 && orientation2 >= 0)
   );
+}
+
+/**
+ * Calculate the intersect point of 2 intersecting lines segments.
+ * Precondition: the lines intersect -> first check with intersectLines.
+ * line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/.
+ *
+ * @param {Line} line1 - The first line
+ * @param {Line} line2 - The second line
+ * @param {Vertex} - The intersecting point
+ */
+export function intersectLinesPoint(line1: Line, line2: Line): Vertex {
+  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = line1;
+  const [{ x: x3, y: y3 }, { x: x4, y: y4 }] = line2;
+
+  // see http://paulbourke.net/geometry/pointlineplane/
+  const denominator = crossProduct(
+    { x: x2 - x1, y: y2 - y1 },
+    { x: x4 - x3, y: y4 - y3 }
+  );
+  // Actually same calculations as above, denumerator just normalizes it
+  const numerator1 = crossProduct(
+    { x: x4 - x3, y: y4 - y3 },
+    { x: x1 - x3, y: y1 - y3 }
+  );
+  const numerator2 = crossProduct(
+    { x: x2 - x1, y: y2 - y1 },
+    { x: x1 - x3, y: y1 - y3 }
+  );
+
+  // The lines are coincident -> just return the middle of a line segment
+  if (numerator1 === 0 && numerator2 === 0 && denominator === 0) {
+    return {
+      x: x2 > x1 ? (x2 - x1) / 2 + x1 : (x1 - x2) / 2 + x2,
+      y: y2 > y1 ? (y2 - y1) / 2 + y1 : (y1 - y2) / 2 + y2,
+    };
+  }
+
+  const ua = numerator1 / denominator;
+  // Calculating one slope is enough
+  // const ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+  // Return a object with the x and y coordinates of the intersection
+  const x = x1 + ua * (x2 - x1);
+  const y = y1 + ua * (y2 - y1);
+
+  return { x, y };
 }
 
 /**
