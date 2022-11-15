@@ -1,4 +1,4 @@
-import { DirectedLine, Line, Vertex } from '../../types';
+import { DirectedLine, Line, Vertex, Edge } from '../../types';
 
 /**
  * Calculates the cross product.
@@ -9,6 +9,33 @@ import { DirectedLine, Line, Vertex } from '../../types';
  */
 export function crossProduct(v1: Vertex, v2: Vertex): number {
   return v1.x * v2.y - v2.x * v1.y;
+}
+
+/**
+ * Calculates the length of a edge.
+ *
+ * @param {Edge} l - The edge
+ * @returns {number} - The length of the edge
+ */
+export function lengthEdge(l: Edge): number {
+  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = l;
+
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
+/**
+ * Calculates the middle of the edge.
+ *
+ * @param {Edge} e - The edge
+ * @returns {Vertex} - The vertex on the middle of the edge
+ */
+export function middleEdge(e: Edge): Vertex {
+  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = e;
+
+  const x = x2 > x1 ? (x2 - x1) / 2 + x1 : (x1 - x2) / 2 + x2;
+  const y = y2 > y1 ? (y2 - y1) / 2 + y1 : (y1 - y2) / 2 + y2;
+
+  return { x, y };
 }
 
 /**
@@ -62,7 +89,9 @@ export function turnOrientation(
 }
 
 /**
- * Determines if 2 given line segments intersect.
+ * @deprecated Needs to be updated to look like intersectEdgesPoint but for lines.
+ *
+ * Determines if 2 given lines intersect, but does not calculate the point.
  *
  * @param {Line} line1 - The first line
  * @param {Line} line2 - The second line
@@ -91,10 +120,77 @@ export function intersectLines(line1: Line, line2: Line): boolean {
     { x: x2 - x1, y: y2 - y1 }
   );
 
+  // If the 2 lines are coincident, both orientations will be 0
   return (
     (orientation1 >= 0 && orientation2 <= 0) ||
     (orientation1 <= 0 && orientation2 >= 0)
   );
+}
+
+/**
+ * Calculate the intersect point of 2 intersecting lines segments (edge).
+ * Precondition: the lines intersect -> first check with intersectLines.
+ * line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/.
+ *
+ * @param {Line} edge1 - The first line
+ * @param {Line} edge2 - The second line
+ * @returns {{ intersect: boolean; p: Vertex }} - An object with intersect key indicating if they intersect or not and p the point
+ */
+export function intersectEdgesPoint(
+  edge1: Edge,
+  edge2: Edge
+): { intersect: boolean; p: Vertex } {
+  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = edge1;
+  const [{ x: x3, y: y3 }, { x: x4, y: y4 }] = edge2;
+  const p: Vertex = {
+    x: 0,
+    y: 0,
+  };
+
+  // can the lines even intersect?
+  if (
+    Math.max(x1, x2) < Math.min(x3, x4) ||
+    Math.max(x3, x4) < Math.min(x1, x2) ||
+    Math.max(y1, y2) < Math.min(y3, y4) ||
+    Math.max(y3, y4) < Math.min(y1, y2)
+  ) {
+    return { intersect: false, p };
+  }
+
+  // see http://paulbourke.net/geometry/pointlineplane/
+  const denominator = crossProduct(
+    { x: x2 - x1, y: y2 - y1 },
+    { x: x4 - x3, y: y4 - y3 }
+  );
+  const numerator1 = crossProduct(
+    { x: x4 - x3, y: y4 - y3 },
+    { x: x1 - x3, y: y1 - y3 }
+  );
+  const numerator2 = crossProduct(
+    { x: x2 - x1, y: y2 - y1 },
+    { x: x1 - x3, y: y1 - y3 }
+  );
+
+  const ua = numerator1 / denominator;
+  const ub = numerator2 / denominator;
+
+  // They don't intersect, edges are not long enough
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+    return { intersect: false, p };
+  }
+
+  // The lines are coincident -> just return the middle of a line segment
+  if (numerator1 === 0 && numerator2 === 0 && denominator === 0) {
+    return { intersect: true, p: middleEdge(edge1) };
+  }
+
+  p.x = x1 + ua * (x2 - x1);
+  p.y = y1 + ua * (y2 - y1);
+
+  return {
+    intersect: true,
+    p,
+  };
 }
 
 /**

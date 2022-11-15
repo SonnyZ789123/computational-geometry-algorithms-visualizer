@@ -43,5 +43,8 @@ export default {
   greenLight: '#5FAD41',
   greenDark: '#004F2D',
   orange: '#D98324',
-  yellow: '#FABC2A',
+  yellowLight: '#FDE549',
+  yellowDark: '#EEB902',
+  brownLight: '#A9927D',
+  brownDark: '#5E503F',
 };
