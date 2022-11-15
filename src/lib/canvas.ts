@@ -79,8 +79,13 @@ export function drawDot(
   v: Vertex,
   color: string
 ) {
+  ctx.save();
+  ctx.transform(1, 0, 0, -1, 0, CANVAS_HEIGHT);
+
   ctx.fillStyle = color;
   ctx.fillRect(v.x - DOT_SIZE / 2, v.y - DOT_SIZE / 2, DOT_SIZE, DOT_SIZE); // Center it
+
+  ctx.restore();
 }
 
 export function drawEdge(
@@ -88,12 +93,17 @@ export function drawEdge(
   [v1, v2]: Edge,
   color: string
 ) {
+  ctx.save();
+  ctx.transform(1, 0, 0, -1, 0, CANVAS_HEIGHT);
+
   ctx.strokeStyle = color;
   ctx.lineWidth = LINE_WIDTH;
   ctx.beginPath();
   ctx.moveTo(v1.x, v1.y);
   ctx.lineTo(v2.x, v2.y);
   ctx.stroke();
+
+  ctx.restore();
 }
 
 export function drawDirectedEdge(
@@ -101,6 +111,9 @@ export function drawDirectedEdge(
   { from, to }: DirectedEdge,
   color: string
 ) {
+  ctx.save();
+  ctx.transform(1, 0, 0, -1, 0, CANVAS_HEIGHT);
+
   ctx.strokeStyle = color;
   ctx.lineWidth = LINE_WIDTH;
   const angle = Math.atan2(to.y - from.y, to.x - from.x);
@@ -117,6 +130,8 @@ export function drawDirectedEdge(
     to.y - ARROW_LEN * Math.sin(angle + Math.PI / 6)
   );
   ctx.stroke();
+
+  ctx.restore();
 }
 
 /**
@@ -129,25 +144,31 @@ export function drawText(
   text: string,
   color: string
 ) {
+  ctx.save();
+  // We don't need t invert y-axis now, just translate the origin to bottom
+  ctx.transform(1, 0, 0, 1, 0, CANVAS_HEIGHT);
+
   const textLength = ctx.measureText(text).width;
-  let xPos = v.x + GRID_SIZE;
-  let yPos = v.y + GRID_SIZE;
+  let xPos = v.x + GRID_SIZE / 2;
+  let yPos = v.y + GRID_SIZE / 2;
 
   ctx.fillStyle = color;
   ctx.font = `${GRID_SIZE * 1.2}px Arial`;
 
   // Position overflows to the right, so draw to the left
   if (xPos + textLength > CANVAS_WIDTH) {
-    xPos = v.x - textLength - GRID_SIZE;
+    xPos = v.x - textLength - GRID_SIZE / 2;
   }
 
   // Position overflows under, so just draw above the vertex
   if (yPos + textLength > CANVAS_HEIGHT) {
-    yPos = v.y - GRID_SIZE;
+    yPos = v.y - GRID_SIZE / 2;
   }
 
   // Draw the number a grid element to the right and under
-  ctx.fillText(text, xPos, yPos);
+  ctx.fillText(text, xPos, -yPos); // Do need to draw negative y-coo
+
+  ctx.restore();
 }
 
 export function redrawBuffer(
@@ -155,9 +176,8 @@ export function redrawBuffer(
   drawBuffer: DrawBuffer
 ) {
   // use for-loop for better performance
-  for (let i = 0; i < drawBuffer.vertices.length; i += 1) {
-    drawDot(ctx, drawBuffer.vertices[i].value, drawBuffer.vertices[i].color);
-  }
+  // Importance (drawn on top of eachother, last is most important)
+  // Edges -> Directed Edges -> Vertices -> Text
   for (let i = 0; i < drawBuffer.edges.length; i += 1) {
     drawEdge(ctx, drawBuffer.edges[i].value, drawBuffer.edges[i].color);
   }
@@ -167,6 +187,9 @@ export function redrawBuffer(
       drawBuffer.directedEdges[i].value,
       drawBuffer.directedEdges[i].color
     );
+  }
+  for (let i = 0; i < drawBuffer.vertices.length; i += 1) {
+    drawDot(ctx, drawBuffer.vertices[i].value, drawBuffer.vertices[i].color);
   }
   for (let i = 0; i < drawBuffer.text.length; i += 1) {
     drawText(

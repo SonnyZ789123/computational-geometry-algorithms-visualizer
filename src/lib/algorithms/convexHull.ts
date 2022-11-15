@@ -177,7 +177,7 @@ export function* andrewConvexHull(
     // So the upper contains only vertices that continually make right turns.
     while (
       upperLength > 2 &&
-      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
+      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) > 0
     ) {
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       upper.splice(upperLength - 2, 1); // Delete the middle vertex
@@ -236,7 +236,7 @@ export function* andrewConvexHull(
 
     while (
       lowerLength > 2 &&
-      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
+      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) > 0
     ) {
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       lower.splice(lowerLength - 2, 1);
@@ -350,8 +350,8 @@ export function* grahamConvexHull(
     });
     yield 'Currently edge to evaluate';
 
-    // While the next edge makes a left turn, delete the second last vertex.
-    // So the upper contains only vertices that continually make right turns.
+    // While the next edge makes a right turn, delete the second last vertex.
+    // So the upper contains only vertices that continually make left turns.
     while (
       upperLength > 2 &&
       turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
@@ -359,7 +359,7 @@ export function* grahamConvexHull(
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       convexHull.splice(upperLength - 2, 1); // Delete the middle vertex
       upperLength -= 1;
-      yield 'Makes left turn, delete previous edge';
+      yield 'Makes right turn, delete previous edge';
 
       // Pop that edge that was faulty part of the convex hull
       localDrawBuffer.directedEdges.pop();
@@ -378,7 +378,7 @@ export function* grahamConvexHull(
     });
 
     clearAndRedrawBuffer(ctx, localDrawBuffer);
-    yield 'No left turns';
+    yield 'No right turns';
   }
 
   // Draw a last edge to connect the last one with the base vertex
