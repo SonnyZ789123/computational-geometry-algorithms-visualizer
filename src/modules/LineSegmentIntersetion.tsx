@@ -92,6 +92,7 @@ function LineSegmentIntersection(): JSX.Element {
       <Canvas canvasRef={canvasRef} />
       <Controls
         algorithmTitle={algorithmRouter.title}
+        dataType='Edge'
         randomize={randomize}
         genAlgorithm={algorithmRouter.algorithm}
         canvasElement={canvasRef.current}

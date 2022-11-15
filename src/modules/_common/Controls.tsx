@@ -118,6 +118,7 @@ const LogItem = styled.li`
 
 type ControlsProps = {
   algorithmTitle: string;
+  dataType: string;
   randomize: (amount: number) => void;
   genAlgorithm: AlgorithmGenerator;
   canvasElement: HTMLCanvasElement | null;
@@ -127,6 +128,7 @@ type ControlsProps = {
 
 function Controls({
   algorithmTitle,
+  dataType,
   randomize,
   genAlgorithm,
   canvasElement,
@@ -269,7 +271,7 @@ function Controls({
         />
       </ControlContainer>
       <ControlContainer>
-        <Description htmlFor='amount'>Vertex Amount:</Description>
+        <Description htmlFor='amount'>{dataType} Amount:</Description>
         <Input
           id='amount'
           name='amount'

@@ -95,6 +95,7 @@ function ConvexHull(): JSX.Element {
       <Canvas canvasRef={canvasRef} />
       <Controls
         algorithmTitle={algorithmRouter.title}
+        dataType='Vertex'
         randomize={randomize}
         genAlgorithm={algorithmRouter.algorithm}
         canvasElement={canvasRef.current}
