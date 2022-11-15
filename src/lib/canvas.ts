@@ -79,8 +79,13 @@ export function drawDot(
   v: Vertex,
   color: string
 ) {
+  ctx.save();
+  ctx.transform(1, 0, 0, -1, 0, CANVAS_HEIGHT);
+
   ctx.fillStyle = color;
   ctx.fillRect(v.x - DOT_SIZE / 2, v.y - DOT_SIZE / 2, DOT_SIZE, DOT_SIZE); // Center it
+
+  ctx.restore();
 }
 
 export function drawEdge(
@@ -88,12 +93,17 @@ export function drawEdge(
   [v1, v2]: Edge,
   color: string
 ) {
+  ctx.save();
+  ctx.transform(1, 0, 0, -1, 0, CANVAS_HEIGHT);
+
   ctx.strokeStyle = color;
   ctx.lineWidth = LINE_WIDTH;
   ctx.beginPath();
   ctx.moveTo(v1.x, v1.y);
   ctx.lineTo(v2.x, v2.y);
   ctx.stroke();
+
+  ctx.restore();
 }
 
 export function drawDirectedEdge(
@@ -101,6 +111,9 @@ export function drawDirectedEdge(
   { from, to }: DirectedEdge,
   color: string
 ) {
+  ctx.save();
+  ctx.transform(1, 0, 0, -1, 0, CANVAS_HEIGHT);
+
   ctx.strokeStyle = color;
   ctx.lineWidth = LINE_WIDTH;
   const angle = Math.atan2(to.y - from.y, to.x - from.x);
@@ -117,6 +130,8 @@ export function drawDirectedEdge(
     to.y - ARROW_LEN * Math.sin(angle + Math.PI / 6)
   );
   ctx.stroke();
+
+  ctx.restore();
 }
 
 /**
@@ -129,6 +144,10 @@ export function drawText(
   text: string,
   color: string
 ) {
+  ctx.save();
+  // We don't need t invert y-axis now, just translate the origin to bottom
+  ctx.transform(1, 0, 0, 1, 0, CANVAS_HEIGHT);
+
   const textLength = ctx.measureText(text).width;
   let xPos = v.x + GRID_SIZE;
   let yPos = v.y + GRID_SIZE;
@@ -147,7 +166,9 @@ export function drawText(
   }
 
   // Draw the number a grid element to the right and under
-  ctx.fillText(text, xPos, yPos);
+  ctx.fillText(text, xPos, -yPos); // Do need to draw negative y-coo
+
+  ctx.restore();
 }
 
 export function redrawBuffer(
