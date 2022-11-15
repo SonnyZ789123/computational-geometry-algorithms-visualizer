@@ -9,7 +9,7 @@ const CURRENT = colors.white;
 const OTHER = colors.secondary;
 const SUCCESS = colors.success;
 const FAIL = colors.danger;
-const CONVEX = colors.yellow;
+const CONVEX = colors.yellowLight;
 const TEXT = colors.greyLight;
 
 /**
