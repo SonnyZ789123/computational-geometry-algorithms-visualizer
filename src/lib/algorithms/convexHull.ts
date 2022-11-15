@@ -177,7 +177,7 @@ export function* andrewConvexHull(
     // So the upper contains only vertices that continually make right turns.
     while (
       upperLength > 2 &&
-      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
+      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) > 0
     ) {
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       upper.splice(upperLength - 2, 1); // Delete the middle vertex
@@ -236,7 +236,7 @@ export function* andrewConvexHull(
 
     while (
       lowerLength > 2 &&
-      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) < 0
+      turnOrientation({ from: v1, to: v2 }, { from: v2, to: v3 }) > 0
     ) {
       drawDirectedEdge(ctx, { from: v1, to: v3 }, FAIL);
       lower.splice(lowerLength - 2, 1);

@@ -70,7 +70,7 @@ export function relativeOrientation(
  *
  * @param {DirectedLine} baseLine - The base line for the orientation
  * @param {DirectedLine} nextLine - The next line that get's compared to the base line
- * @returns {number} - 0 if they extend eachother, > 0 if the next line makes a clockwise turn, < 0 if the next line makes a counter clockwise turn.
+ * @returns {number} - 0 if they extend eachother, > 0 if the next line makes a counter-clockwise turn, < 0 if the next line makes a clockwise turn.
  */
 export function turnOrientation(
   baseLine: DirectedLine,
