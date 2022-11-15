@@ -5,7 +5,10 @@ import {
   generateRandomEdges,
   readyCanvas,
 } from '../lib/canvas';
-import { lineSegmentIntersectionBruteForce } from '../lib/algorithms/lineSegmentIntersection';
+import {
+  lineSegmentIntersectionBruteForce,
+  lineSegmentIntersectionPlaneSweep,
+} from '../lib/algorithms/lineSegmentIntersection';
 
 import { AlgorithmGenerator, DrawBuffer, Edge } from '../types';
 import colors from '../global/styles/colors';
@@ -32,7 +35,7 @@ const useAlgorithmRouter = () => {
       case PLANE_SWEEP:
         return {
           title: 'Plane Sweep Algorithm',
-          algorithm: undefined as unknown as AlgorithmGenerator,
+          algorithm: lineSegmentIntersectionPlaneSweep,
         };
       default:
         return undefined as unknown as {

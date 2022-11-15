@@ -12,15 +12,30 @@ export function crossProduct(v1: Vertex, v2: Vertex): number {
 }
 
 /**
- * Calculates the length of a line segment.
+ * Calculates the length of a edge.
  *
- * @param {Line} l - The line
- * @returns {number} - The length of the line
+ * @param {Edge} l - The edge
+ * @returns {number} - The length of the edge
  */
-export function lengthLine(l: Line): number {
+export function lengthEdge(l: Edge): number {
   const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = l;
 
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
+/**
+ * Calculates the middle of the edge.
+ *
+ * @param {Edge} e - The edge
+ * @returns {Vertex} - The vertex on the middle of the edge
+ */
+export function middleEdge(e: Edge): Vertex {
+  const [{ x: x1, y: y1 }, { x: x2, y: y2 }] = e;
+
+  const x = x2 > x1 ? (x2 - x1) / 2 + x1 : (x1 - x2) / 2 + x2;
+  const y = y2 > y1 ? (y2 - y1) / 2 + y1 : (y1 - y2) / 2 + y2;
+
+  return { x, y };
 }
 
 /**
@@ -166,10 +181,7 @@ export function intersectEdgesPoint(
 
   // The lines are coincident -> just return the middle of a line segment
   if (numerator1 === 0 && numerator2 === 0 && denominator === 0) {
-    p.x = x2 > x1 ? (x2 - x1) / 2 + x1 : (x1 - x2) / 2 + x2;
-    p.y = y2 > y1 ? (y2 - y1) / 2 + y1 : (y1 - y2) / 2 + y2;
-
-    return { intersect: true, p };
+    return { intersect: true, p: middleEdge(edge1) };
   }
 
   p.x = x1 + ua * (x2 - x1);
