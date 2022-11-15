@@ -6,10 +6,8 @@ import {
 import {
   CANVAS_WIDTH,
   clearAndRedrawBuffer,
-  drawDirectedEdge,
   drawDot,
   drawEdge,
-  drawText,
 } from '../canvas';
 
 import {
@@ -18,6 +16,8 @@ import {
   DrawBuffer,
   Vertex,
   Edge,
+  NamedEdge,
+  NamedVertex,
 } from '../../types';
 import colors from '../../global/styles/colors';
 
@@ -28,6 +28,7 @@ const SUCCESS = colors.greenLight;
 const FAIL = colors.danger;
 const TEXT = colors.greyLight;
 const INTERSECT = colors.yellow; // yellow because not enough contrast with underlying lines
+const SWEEP = colors.blueLight;
 
 /**
  * Draw the intersecting line segment points in a brute force manner.
@@ -90,16 +91,6 @@ export function* lineSegmentIntersectionBruteForce(
   return localDrawBuffer;
 }
 
-type NamedVertex = {
-  name: string;
-  v: Vertex;
-};
-
-type NamedEdge = {
-  name: string;
-  e: [NamedVertex, NamedVertex];
-};
-
 // Temporary solution to balanced binary search tree.
 function addEdgeToState(
   state: NamedEdge[],
@@ -119,6 +110,27 @@ function addEdgeToState(
   state.splice(addIndex, 0, edge);
 
   return addIndex;
+}
+
+type Event = {
+  type: 'intersection' | 'upper' | 'lower';
+  vertex: NamedVertex;
+  edge: NamedEdge | [NamedEdge, NamedEdge]; // With type intersection it needs to eb [Edge, Edge]
+};
+
+function intersectionFound(
+  events: Event[],
+  edge1: NamedEdge,
+  edge2: NamedEdge
+): boolean {
+  return !!events.find(
+    (event) =>
+      (event.type === 'intersection' &&
+        (event.edge as [NamedEdge, NamedEdge])[0] === edge1 &&
+        (event.edge as [NamedEdge, NamedEdge])[1] === edge2) ||
+      ((event.edge as [NamedEdge, NamedEdge])[0] === edge2 &&
+        (event.edge as [NamedEdge, NamedEdge])[1] === edge1)
+  );
 }
 
 /**
@@ -150,12 +162,6 @@ export function* lineSegmentIntersectionPlaneSweep(
     text: [...drawBuffer.text],
   };
 
-  type Event = {
-    type: 'intersection' | 'upper' | 'lower';
-    vertex: NamedVertex;
-    edge: NamedEdge | [NamedEdge, NamedEdge]; // With type intersection it needs to eb [Edge, Edge]
-  };
-
   // Reorder the edges so the vertex of the vertex with the highest y-value is first
   // Give them a name
   const orderedEdges: NamedEdge[] = edges.map((e, i) =>
@@ -177,6 +183,7 @@ export function* lineSegmentIntersectionPlaneSweep(
   );
 
   // Draw the names on the vertices and edges
+  // Draw the vertices
   orderedEdges.forEach((namedEdge) => {
     const middle = middleEdge([namedEdge.e[0].v, namedEdge.e[1].v]);
 
@@ -239,11 +246,11 @@ export function* lineSegmentIntersectionPlaneSweep(
     ];
 
     // TODO: maybe make a function drawLine so it is definetly the whole canvas
-    drawEdge(ctx, sweep, OTHER);
-    localDrawBuffer.edges.push({ value: sweep, color: OTHER });
+    drawEdge(ctx, sweep, SWEEP);
+    localDrawBuffer.edges.push({ value: sweep, color: SWEEP });
     yield `Update plane sweep to next event: ${currentEvent.type} ${currentEvent.vertex.name}`;
 
-    yield `status: ${state.map(({ name }) => name).join('-')}`;
+    yield `Status: ${state.map(({ name }) => name).join('-')}`;
 
     if (currentEvent.type === 'upper') {
       const currentEventEdge: Edge = [
@@ -257,7 +264,7 @@ export function* lineSegmentIntersectionPlaneSweep(
         currentEvent.vertex,
         currentEvent.edge as NamedEdge
       ); // where to push? --> binary balanced search tree
-      yield `status: ${state.map(({ name }) => name).join('-')}`;
+      yield `Add edge to status: ${state.map(({ name }) => name).join('-')}`;
 
       // Test his maybe 2 neighbours for intersection
       const left = state[i - 1];
@@ -265,10 +272,7 @@ export function* lineSegmentIntersectionPlaneSweep(
 
       // if intersection and below => add to events
       if (left) {
-        const leftEdge: Edge = [
-          (left as NamedEdge).e[0].v,
-          (left as NamedEdge).e[1].v,
-        ];
+        const leftEdge: Edge = [left.e[0].v, left.e[1].v];
 
         const { intersect, p } = intersectEdgesPoint(
           currentEventEdge,
@@ -276,18 +280,23 @@ export function* lineSegmentIntersectionPlaneSweep(
         );
 
         drawEdge(ctx, currentEventEdge, CURRENT);
-        drawEdge(ctx, leftEdge, OTHER);
+        drawEdge(ctx, leftEdge, CURRENT);
         yield 'Current edges to test on intersection';
 
         if (intersect && p.y < currentEventVertex.y) {
-          events.push({
-            type: 'intersection',
-            vertex: { name: 'i', v: p },
-            edge: [currentEvent.edge as NamedEdge, left],
-          });
+          if (intersectionFound(events, currentEvent.edge as NamedEdge, left)) {
+            yield 'They intersect but already found';
+          } else {
+            events.push({
+              type: 'intersection',
+              vertex: { name: 'i', v: p },
+              edge: [currentEvent.edge as NamedEdge, left],
+            });
 
-          drawDot(ctx, p, SUCCESS);
-          yield 'They intersect, add to event queue';
+            drawDot(ctx, p, SUCCESS);
+            localDrawBuffer.vertices.push({ value: p, color: OTHER });
+            yield 'They intersect, add to event queue';
+          }
         } else {
           drawEdge(ctx, currentEventEdge, FAIL);
           drawEdge(ctx, leftEdge, FAIL);
@@ -297,10 +306,7 @@ export function* lineSegmentIntersectionPlaneSweep(
         clearAndRedrawBuffer(ctx, localDrawBuffer);
       }
       if (right) {
-        const rightEdge: Edge = [
-          (right as NamedEdge).e[0].v,
-          (right as NamedEdge).e[1].v,
-        ];
+        const rightEdge: Edge = [right.e[0].v, right.e[1].v];
 
         const { intersect, p } = intersectEdgesPoint(
           currentEventEdge,
@@ -308,18 +314,25 @@ export function* lineSegmentIntersectionPlaneSweep(
         );
 
         drawEdge(ctx, currentEventEdge, CURRENT);
-        drawEdge(ctx, rightEdge, OTHER);
+        drawEdge(ctx, rightEdge, CURRENT);
         yield 'Current edges to test on intersection';
 
         if (intersect && p.y < currentEventVertex.y) {
-          events.push({
-            type: 'intersection',
-            vertex: { name: 'i', v: p },
-            edge: [currentEvent.edge as NamedEdge, right],
-          });
+          if (
+            intersectionFound(events, currentEvent.edge as NamedEdge, right)
+          ) {
+            yield 'They intersect but already found';
+          } else {
+            events.push({
+              type: 'intersection',
+              vertex: { name: 'i', v: p },
+              edge: [currentEvent.edge as NamedEdge, right],
+            });
 
-          drawDot(ctx, p, SUCCESS);
-          yield 'They intersect, add to event queue';
+            drawDot(ctx, p, SUCCESS);
+            localDrawBuffer.vertices.push({ value: p, color: OTHER });
+            yield 'They intersect, add to event queue';
+          }
         } else {
           drawEdge(ctx, currentEventEdge, FAIL);
           drawEdge(ctx, rightEdge, FAIL);
@@ -335,7 +348,9 @@ export function* lineSegmentIntersectionPlaneSweep(
       const edgeIndex = state.findIndex((e) => e === currentEvent.edge);
       state.splice(edgeIndex, 1);
 
-      yield `status: ${state.map(({ name }) => name).join('-')}`;
+      yield `Delete edge from status: ${state
+        .map(({ name }) => name)
+        .join('-')}`;
 
       // test 2 new neighbours
       const left = state[edgeIndex - 1];
@@ -343,31 +358,30 @@ export function* lineSegmentIntersectionPlaneSweep(
 
       // if intersection and below => add to events
       if (left && right) {
-        const leftEdge: Edge = [
-          (left as NamedEdge).e[0].v,
-          (left as NamedEdge).e[1].v,
-        ];
+        const leftEdge: Edge = [left.e[0].v, left.e[1].v];
 
-        const rightEdge: Edge = [
-          (right as NamedEdge).e[0].v,
-          (right as NamedEdge).e[1].v,
-        ];
+        const rightEdge: Edge = [right.e[0].v, right.e[1].v];
 
         const { intersect, p } = intersectEdgesPoint(leftEdge, rightEdge);
 
-        drawEdge(ctx, leftEdge, OTHER);
-        drawEdge(ctx, rightEdge, OTHER);
+        drawEdge(ctx, leftEdge, CURRENT);
+        drawEdge(ctx, rightEdge, CURRENT);
         yield 'Current edges to test on intersection';
 
         if (intersect && p.y < currentEventVertex.y) {
-          events.push({
-            type: 'intersection',
-            vertex: { name: 'i', v: p },
-            edge: [left, right],
-          });
+          if (intersectionFound(events, left, right)) {
+            yield 'They intersect but already found';
+          } else {
+            events.push({
+              type: 'intersection',
+              vertex: { name: 'i', v: p },
+              edge: [left, right],
+            });
 
-          drawDot(ctx, p, SUCCESS);
-          yield 'They intersect, add to event queue';
+            drawDot(ctx, p, SUCCESS);
+            localDrawBuffer.vertices.push({ value: p, color: OTHER });
+            yield 'They intersect, add to event queue';
+          }
         } else {
           drawEdge(ctx, leftEdge, FAIL);
           drawEdge(ctx, rightEdge, FAIL);
@@ -388,7 +402,7 @@ export function* lineSegmentIntersectionPlaneSweep(
           : index1 + 1; // left or right
       [state[index1], state[index2]] = [state[index2], state[index1]]; // swap places
 
-      yield `status: ${state.map(({ name }) => name).join('-')}`;
+      yield `Swap edges in status: ${state.map(({ name }) => name).join('-')}`;
 
       // Make index1 the lowest value and index2 the one next to it
       [index1, index2] = index1 < index2 ? [index1, index2] : [index2, index1];
@@ -407,10 +421,7 @@ export function* lineSegmentIntersectionPlaneSweep(
 
       // if intersection and below => add to events
       if (left) {
-        const leftEdge: Edge = [
-          (left as NamedEdge).e[0].v,
-          (left as NamedEdge).e[1].v,
-        ];
+        const leftEdge: Edge = [left.e[0].v, left.e[1].v];
 
         const { intersect, p } = intersectEdgesPoint(
           intersectionEdge1,
@@ -418,18 +429,23 @@ export function* lineSegmentIntersectionPlaneSweep(
         );
 
         drawEdge(ctx, intersectionEdge1, CURRENT);
-        drawEdge(ctx, leftEdge, OTHER);
+        drawEdge(ctx, leftEdge, CURRENT);
         yield 'Current edges to test on intersection';
 
         if (intersect && p.y < currentEventVertex.y) {
-          events.push({
-            type: 'intersection',
-            vertex: { name: 'i', v: p },
-            edge: [state[index1], left],
-          });
+          if (intersectionFound(events, state[index1], left)) {
+            yield 'They intersect but already found';
+          } else {
+            events.push({
+              type: 'intersection',
+              vertex: { name: 'i', v: p },
+              edge: [state[index1], left],
+            });
 
-          drawDot(ctx, p, SUCCESS);
-          yield 'They intersect';
+            drawDot(ctx, p, SUCCESS);
+            localDrawBuffer.vertices.push({ value: p, color: OTHER });
+            yield 'They intersect';
+          }
         } else {
           drawEdge(ctx, intersectionEdge1, FAIL);
           drawEdge(ctx, leftEdge, FAIL);
@@ -439,10 +455,7 @@ export function* lineSegmentIntersectionPlaneSweep(
         clearAndRedrawBuffer(ctx, localDrawBuffer);
       }
       if (right) {
-        const rightEdge: Edge = [
-          (right as NamedEdge).e[0].v,
-          (right as NamedEdge).e[1].v,
-        ];
+        const rightEdge: Edge = [right.e[0].v, right.e[1].v];
 
         const { intersect, p } = intersectEdgesPoint(
           intersectionEdge2,
@@ -450,18 +463,23 @@ export function* lineSegmentIntersectionPlaneSweep(
         );
 
         drawEdge(ctx, intersectionEdge2, CURRENT);
-        drawEdge(ctx, rightEdge, OTHER);
+        drawEdge(ctx, rightEdge, CURRENT);
         yield 'Current edges to test on intersection';
 
         if (intersect && p.y < currentEventVertex.y) {
-          events.push({
-            type: 'intersection',
-            vertex: { name: 'i', v: p },
-            edge: [state[index2], right],
-          });
+          if (intersectionFound(events, state[index2], right)) {
+            yield 'They intersect but already found';
+          } else {
+            events.push({
+              type: 'intersection',
+              vertex: { name: 'i', v: p },
+              edge: [state[index2], right],
+            });
 
-          drawDot(ctx, p, SUCCESS);
-          yield 'They intersect';
+            drawDot(ctx, p, SUCCESS);
+            localDrawBuffer.vertices.push({ value: p, color: OTHER });
+            yield 'They intersect';
+          }
         } else {
           drawEdge(ctx, intersectionEdge2, FAIL);
           drawEdge(ctx, rightEdge, FAIL);

@@ -4,7 +4,17 @@ export type Vertex = {
   y: number;
 };
 
+export type NamedVertex = {
+  name: string;
+  v: Vertex;
+};
+
 export type Edge = [Vertex, Vertex];
+
+export type NamedEdge = {
+  name: string;
+  e: [NamedVertex, NamedVertex];
+};
 
 export type DirectedEdge = {
   from: Vertex;
