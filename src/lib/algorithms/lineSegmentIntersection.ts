@@ -26,8 +26,9 @@ const CURRENT = colors.white;
 const OTHER = colors.secondary;
 const SUCCESS = colors.greenLight;
 const FAIL = colors.danger;
-const TEXT = colors.greyLight;
-const INTERSECT = colors.yellow; // yellow because not enough contrast with underlying lines
+const EDGE_TEXT = colors.brownLight;
+const VERTEX_TEXT = colors.brownDark;
+const INTERSECT = colors.yellowLight; // yellow because not enough contrast with underlying lines
 const SWEEP = colors.blueLight;
 
 /**
@@ -91,6 +92,12 @@ export function* lineSegmentIntersectionBruteForce(
   return localDrawBuffer;
 }
 
+type Event = {
+  type: 'intersection' | 'upper' | 'lower';
+  vertex: NamedVertex;
+  edge: NamedEdge | [NamedEdge, NamedEdge]; // With type intersection it needs to eb [Edge, Edge]
+};
+
 // Temporary solution to balanced binary search tree.
 function addEdgeToState(
   state: NamedEdge[],
@@ -111,12 +118,6 @@ function addEdgeToState(
 
   return addIndex;
 }
-
-type Event = {
-  type: 'intersection' | 'upper' | 'lower';
-  vertex: NamedVertex;
-  edge: NamedEdge | [NamedEdge, NamedEdge]; // With type intersection it needs to eb [Edge, Edge]
-};
 
 function intersectionFound(
   events: Event[],
@@ -193,21 +194,21 @@ export function* lineSegmentIntersectionPlaneSweep(
           position: middle,
           text: namedEdge.name,
         },
-        color: TEXT,
+        color: EDGE_TEXT,
       },
       {
         value: {
           position: namedEdge.e[0].v,
           text: namedEdge.e[0].name,
         },
-        color: TEXT,
+        color: VERTEX_TEXT,
       },
       {
         value: {
           position: namedEdge.e[1].v,
           text: namedEdge.e[1].name,
         },
-        color: TEXT,
+        color: VERTEX_TEXT,
       }
     );
 
@@ -228,7 +229,7 @@ export function* lineSegmentIntersectionPlaneSweep(
   const state: NamedEdge[] = [];
 
   clearAndRedrawBuffer(ctx, localDrawBuffer);
-  yield 'Add upper and lower endpoint of every edge to the event queue';
+  yield 'Add every upper and lower endpoint to the event queue';
 
   // Sort the events on lower to higher y-value, because we will work from right to left
   // So we will start from highest event and pop it till the events are empty
@@ -250,8 +251,10 @@ export function* lineSegmentIntersectionPlaneSweep(
     localDrawBuffer.edges.push({ value: sweep, color: SWEEP });
     yield `Update plane sweep to next event: ${currentEvent.type} ${currentEvent.vertex.name}`;
 
-    yield `Status: ${state.map(({ name }) => name).join('-')}`;
+    yield `Current status: ${state.map(({ name }) => name).join('-')}`;
 
+    /// ///////////////////////////////////////////
+    // Handle upper endpoint
     if (currentEvent.type === 'upper') {
       const currentEventEdge: Edge = [
         (currentEvent.edge as NamedEdge).e[0].v,
@@ -259,14 +262,15 @@ export function* lineSegmentIntersectionPlaneSweep(
       ];
       const currentEventVertex: Vertex = currentEvent.vertex.v;
 
+      // Add edge to the state
       const i = addEdgeToState(
         state,
         currentEvent.vertex,
         currentEvent.edge as NamedEdge
-      ); // where to push? --> binary balanced search tree
+      );
       yield `Add edge to status: ${state.map(({ name }) => name).join('-')}`;
 
-      // Test his maybe 2 neighbours for intersection
+      // Test his maybe 2 neighbours for intersaction
       const left = state[i - 1];
       const right = state[i + 1];
 
@@ -289,7 +293,7 @@ export function* lineSegmentIntersectionPlaneSweep(
           } else {
             events.push({
               type: 'intersection',
-              vertex: { name: 'i', v: p },
+              vertex: { name: 'intersection', v: p },
               edge: [currentEvent.edge as NamedEdge, left],
             });
 
@@ -325,7 +329,7 @@ export function* lineSegmentIntersectionPlaneSweep(
           } else {
             events.push({
               type: 'intersection',
-              vertex: { name: 'i', v: p },
+              vertex: { name: 'intersection', v: p },
               edge: [currentEvent.edge as NamedEdge, right],
             });
 
@@ -341,7 +345,10 @@ export function* lineSegmentIntersectionPlaneSweep(
 
         clearAndRedrawBuffer(ctx, localDrawBuffer);
       }
-    } else if (currentEvent.type === 'lower') {
+    }
+    /// ///////////////////////////////////////////
+    // Handle lower endpoint
+    else if (currentEvent.type === 'lower') {
       const currentEventVertex: Vertex = currentEvent.vertex.v;
 
       // Remove the edge from state
@@ -352,14 +359,13 @@ export function* lineSegmentIntersectionPlaneSweep(
         .map(({ name }) => name)
         .join('-')}`;
 
-      // test 2 new neighbours
+      // Test maybe 2 new neighbours
       const left = state[edgeIndex - 1];
       const right = state[edgeIndex]; // Because we spliced the previous element on edgeIndex
 
       // if intersection and below => add to events
       if (left && right) {
         const leftEdge: Edge = [left.e[0].v, left.e[1].v];
-
         const rightEdge: Edge = [right.e[0].v, right.e[1].v];
 
         const { intersect, p } = intersectEdgesPoint(leftEdge, rightEdge);
@@ -374,7 +380,7 @@ export function* lineSegmentIntersectionPlaneSweep(
           } else {
             events.push({
               type: 'intersection',
-              vertex: { name: 'i', v: p },
+              vertex: { name: 'intersection', v: p },
               edge: [left, right],
             });
 
@@ -390,7 +396,10 @@ export function* lineSegmentIntersectionPlaneSweep(
 
         clearAndRedrawBuffer(ctx, localDrawBuffer);
       }
-    } else if (currentEvent.type === 'intersection') {
+    }
+    /// ///////////////////////////////////////////
+    // Handle intersection
+    else if (currentEvent.type === 'intersection') {
       const currentEventVertex: Vertex = currentEvent.vertex.v;
 
       let index1 = state.findIndex(
@@ -399,7 +408,7 @@ export function* lineSegmentIntersectionPlaneSweep(
       let index2 =
         state[index1 - 1] === (currentEvent.edge as [NamedEdge, NamedEdge])[1]
           ? index1 - 1
-          : index1 + 1; // left or right
+          : index1 + 1; // left or right of index1
       [state[index1], state[index2]] = [state[index2], state[index1]]; // swap places
 
       yield `Swap edges in status: ${state.map(({ name }) => name).join('-')}`;
@@ -413,7 +422,7 @@ export function* lineSegmentIntersectionPlaneSweep(
         state[index1].e[0].v,
         state[index1].e[1].v,
       ];
-      const right = state[index2 + 1]; // Because we spliced the previous element on edgeIndex
+      const right = state[index2 + 1];
       const intersectionEdge2: Edge = [
         state[index2].e[0].v,
         state[index2].e[1].v,
@@ -438,7 +447,7 @@ export function* lineSegmentIntersectionPlaneSweep(
           } else {
             events.push({
               type: 'intersection',
-              vertex: { name: 'i', v: p },
+              vertex: { name: 'intersection', v: p },
               edge: [state[index1], left],
             });
 
@@ -472,7 +481,7 @@ export function* lineSegmentIntersectionPlaneSweep(
           } else {
             events.push({
               type: 'intersection',
-              vertex: { name: 'i', v: p },
+              vertex: { name: 'intersection', v: p },
               edge: [state[index2], right],
             });
 
