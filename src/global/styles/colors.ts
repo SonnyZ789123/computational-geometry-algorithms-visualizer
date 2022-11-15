@@ -42,9 +42,16 @@ export default {
   redDark: '#761921',
   greenLight: '#5FAD41',
   greenDark: '#004F2D',
-  orange: '#D98324',
+  orangeLight: '#D98324',
   yellowLight: '#FDE549',
   yellowDark: '#EEB902',
   brownLight: '#A9927D',
   brownDark: '#5E503F',
+
+  // bright (for contrast on canvas)
+  turquoise: '#42F0DE',
+  malachite: '#04E762',
+  paradisePink: '#E83F6F',
+  coquelicot: '#FC440F',
+  flickerPink: '#F72585',
 };

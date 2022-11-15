@@ -28,7 +28,7 @@ const SUCCESS = colors.greenLight;
 const FAIL = colors.danger;
 const EDGE_TEXT = colors.brownLight;
 const VERTEX_TEXT = colors.brownDark;
-const INTERSECT = colors.yellowLight; // yellow because not enough contrast with underlying lines
+const INTERSECT = colors.paradisePink; // yellow because not enough contrast with underlying lines
 const SWEEP = colors.blueLight;
 
 /**

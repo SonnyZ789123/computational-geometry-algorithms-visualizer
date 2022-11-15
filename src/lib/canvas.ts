@@ -149,20 +149,20 @@ export function drawText(
   ctx.transform(1, 0, 0, 1, 0, CANVAS_HEIGHT);
 
   const textLength = ctx.measureText(text).width;
-  let xPos = v.x + GRID_SIZE;
-  let yPos = v.y + GRID_SIZE;
+  let xPos = v.x + GRID_SIZE / 2;
+  let yPos = v.y + GRID_SIZE / 2;
 
   ctx.fillStyle = color;
   ctx.font = `${GRID_SIZE * 1.2}px Arial`;
 
   // Position overflows to the right, so draw to the left
   if (xPos + textLength > CANVAS_WIDTH) {
-    xPos = v.x - textLength - GRID_SIZE;
+    xPos = v.x - textLength - GRID_SIZE / 2;
   }
 
   // Position overflows under, so just draw above the vertex
   if (yPos + textLength > CANVAS_HEIGHT) {
-    yPos = v.y - GRID_SIZE;
+    yPos = v.y - GRID_SIZE / 2;
   }
 
   // Draw the number a grid element to the right and under
@@ -176,9 +176,8 @@ export function redrawBuffer(
   drawBuffer: DrawBuffer
 ) {
   // use for-loop for better performance
-  for (let i = 0; i < drawBuffer.vertices.length; i += 1) {
-    drawDot(ctx, drawBuffer.vertices[i].value, drawBuffer.vertices[i].color);
-  }
+  // Importance (drawn on top of eachother, last is most important)
+  // Edges -> Directed Edges -> Vertices -> Text
   for (let i = 0; i < drawBuffer.edges.length; i += 1) {
     drawEdge(ctx, drawBuffer.edges[i].value, drawBuffer.edges[i].color);
   }
@@ -188,6 +187,9 @@ export function redrawBuffer(
       drawBuffer.directedEdges[i].value,
       drawBuffer.directedEdges[i].color
     );
+  }
+  for (let i = 0; i < drawBuffer.vertices.length; i += 1) {
+    drawDot(ctx, drawBuffer.vertices[i].value, drawBuffer.vertices[i].color);
   }
   for (let i = 0; i < drawBuffer.text.length; i += 1) {
     drawText(
